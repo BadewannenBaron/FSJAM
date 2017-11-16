@@ -45,96 +45,10 @@
 	  .load(setup);
 	
 
-var cat, state;
+var player, state;
 var velocity=7.5;
+var boundary = {"top":20, "bottom":window.innerHeight, "left":20, "right":window.innerWidth-20};
 
-
-
-function setup() {
-
-  //Create the `cat` sprite 
-  cat = new Sprite(resources["images/cat.png"].texture);
-  cat.y = 96;  	//Anfangs koordinaten
-  cat.vx = 0;   // Anfangs geschwindigkeit
-  cat.vy = 0;
-  stage.addChild(cat);
-
-var left = keyboard(37),  //Ascii keyboard bindings
-     up = keyboard(38),
-      right = keyboard(39),
-      down = keyboard(40);
-
-   //left
-  left.press = function() {
-	//move the cat
-    cat.vx = -velocity;
-    cat.vy = 0;
-  };
-
-  left.release = function() {
-    //Stop the cat
-    if (!right.isDown && cat.vy === 0) {
-      cat.vx = 0;
-    }
-  };
-
-  //Up
-  up.press = function() {
-    cat.vy = -velocity;
-    cat.vx = 0;
-  };
-  up.release = function() {
-    if (!down.isDown && cat.vx === 0) {
-      cat.vy = 0;
-    }
-  };
-
-  //Right
-  right.press = function() {
-    cat.vx = velocity;
-    cat.vy = 0;
-  };
-  right.release = function() {
-    if (!left.isDown && cat.vy === 0) {
-      cat.vx = 0;
-    }
-  };
-
-  //Down
-  down.press = function() {
-    cat.vy = velocity;
-    cat.vx = 0;
-  };
-  down.release = function() {
-    if (!up.isDown && cat.vx === 0) {
-      cat.vy = 0;
-    }
-  };
-
-  //Set the game state
-  state = play;
- 
-  //Start the game loop
-  gameLoop();
-}
-
-
-function gameLoop(){
-
-  //Loop this function 60 times per second
-  requestAnimationFrame(gameLoop);
- //Update the current game state:
-  state();
-//Render the stage
-  renderer.render(stage);
-}
-
-function play() {
-
-  //Move the cat 1 pixel to the right each frame
-  cat.y += cat.vy;
-  cat.x += cat.vx;
-}
 
 function keyboard(keyCode) {
   var key = {};
@@ -170,6 +84,117 @@ function keyboard(keyCode) {
   );
   return key;
 }
+
+
+function isOutsideBoundary(player){
+	if(player.x < (boundary.left)) return true;
+	if(player.y < (boundary.top)) return true;
+	if(player.x > (boundary.right)) return true;
+	if(player.y > (boundary.bottom)) return true;
+	return false;
+}
+
+function checkOutsideBoundary(player){
+	if(isOutsideBoundary(player) ){
+		
+		//player.position.set(player.initX, player.initY);
+		return true;
+	}
+	return false;
+}
+
+function setup() {
+
+  //Create the `player` sprite 
+  player = new Sprite(resources["images/cat.png"].texture);
+  player.y = 96;  	//Anfangs koordinaten
+  player.vx = 0;   // Anfangs geschwindigkeit
+  player.vy = 0;
+  stage.addChild(player);
+
+var left = keyboard(37),  //Ascii keyboard bindings
+     up = keyboard(38),
+      right = keyboard(39),
+      down = keyboard(40);
+
+   //left
+  left.press = function() {
+	//move the player
+    player.vx = -velocity;
+    player.vy = 0;
+  };
+
+  left.release = function() {
+    //Stop the player
+    if (!right.isDown && player.vy === 0) {
+      player.vx = 0;
+    }
+  };
+
+  //Up
+  up.press = function() {
+    player.vy = -velocity;
+    player.vx = 0;
+  };
+  up.release = function() {
+    if (!down.isDown && player.vx === 0) {
+      player.vy = 0;
+    }
+  };
+
+  //Right
+  right.press = function() {
+    player.vx = velocity;
+    player.vy = 0;
+  };
+  right.release = function() {
+    if (!left.isDown && player.vy === 0) {
+      player.vx = 0;
+    }
+  };
+
+  //Down
+  down.press = function() {
+    player.vy = velocity;
+    player.vx = 0;
+  };
+  down.release = function() {
+    if (!up.isDown && player.vx === 0) {
+      player.vy = 0;
+    }
+  };
+
+ checkOutsideBoundary(player);
+  //Set the game state
+  state = play;
+ 
+  //Start the game loop
+  gameLoop();
+}
+
+
+
+
+function gameLoop(){
+
+  //Loop this function 60 times per second
+  requestAnimationFrame(gameLoop);
+ //Update the current game state:
+  state();
+ checkOutsideBoundary(player);
+//Render the stage
+  renderer.render(stage);
+}
+
+function play() {
+
+  //Move the player 1 pixel to the right each frame
+  player.y += player.vy;
+  player.x += player.vx;
+  checkOutsideBoundary(player);
+
+}
+
 
 </script>
 </body>
