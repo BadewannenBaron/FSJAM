@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>TOLLER GJ TITEL</title>
+</head>
+  <script src="pixi.min.js"></script>
+<body>
+
+  <script type="text/javascript">
+
+	//Aliases
+	var Container = PIXI.Container,
+   	    autoDetectRenderer = PIXI.autoDetectRenderer,
+    	    loader = PIXI.loader,
+            resources = PIXI.loader.resources,
+            Sprite = PIXI.Sprite,
+            Text = PIXI.Text,
+            Graphics = PIXI.Graphics;
+
+	
+
+	var type = "WebGL"
+	 	if(!PIXI.utils.isWebGLSupported()){
+	 		type = "canvas";
+	 	}
+
+	//Create a container object called the `stage`
+	// Whatever you put inside the stage will be rendered on the canvas.
+	var stage = new Container(),
+	
+	//definiert den renderer
+		renderer = autoDetectRenderer(256, 256);
+	 	renderer.backgroundColor = 0x061639;
+	 	renderer.view.style.position = "absolute";
+	 	renderer.view.style.display = "block";
+	 	renderer.autoResize = true;
+	 	renderer.resize(window.innerWidth, window.innerHeight);
+		//Add the canvas to the HTML document
+		document.body.appendChild(renderer.view);
+
+	//load an image and run the `setup` function when it's done
+	loader
+	  .add("images/cat.png")
+	  .load(setup);
+	
+	//wird aufgerufen wenn Bild erfolgreich geladen
+	function setup() {
+  //Create the `cat` sprite, add it to the stage, and render it
+	  var cat = new Sprite(resources["images/cat.png"].texture);  
+  		stage.addChild(cat);
+  		renderer.render(stage);
+		}
+
+</script>
+</body>
+</html>
+
+
+
+
+
