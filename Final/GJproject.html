@@ -10,8 +10,8 @@
 
   <script type="text/javascript">
 
-  var x = 10
-  var y = 1
+  var x = 5
+  var y = 5
   var grid = new Array(x)
 
   for (i = 0; i < x; i++) {
@@ -21,7 +21,7 @@
     }
     // console.log(i + ": " + grid[i]);
   }
-  console.log(grid)
+  grid[2][2] = 0
 
 	//Aliases
 	var Container = PIXI.Container,
@@ -108,30 +108,34 @@ function isOutsideBoundary(player){
 	return false;
 }
 
-function checkOutsideBoundary(player){
-	if(isOutsideBoundary(player) ){
-
-		player.position.set(player.initX, player.initY);
-		return true;
-	}
-	return false;
-}
-
 function setup() {
 
-  var rectangle = new Graphics();
-  // rectangle.lineStyle(4, 0xFF3300, 1);
-  rectangle.beginFill(0x66CCFF);
-  rectangle.drawRect(0, 0, 100 * x, 100 * y);
-  rectangle.endFill();
-  rectangle.x = 50;
-  rectangle.y = 50;
-  stage.addChild(rectangle);
+
+  for (i = 0; i < x; i++) {
+    for (j = 0; j < y; j++) {
+      if (grid[i][j] == 0) {
+        continue
+      }
+
+      var rectangle = new Graphics();
+      // rectangle.lineStyle(4, 0xFF3300, 1);
+
+      rectangle.beginFill(0x66CCFF);
+      rectangle.drawRect(0, 0, 100, 100);
+      rectangle.endFill();
+
+      rectangle.x = 100 * i
+      rectangle.y = 100 * j
+      stage.addChild(rectangle);
+    }
+  }
+
+
 
   //Create the `player` sprite
   player = new Sprite(resources["images/cat.png"].texture);
-  player.x = 50
-  player.y = 50;  	//Anfangs koordinaten
+  player.x = 0
+  player.y = 0;  	//Anfangs koordinaten
   player.vx = 0;   // Anfangs geschwindigkeit
   player.vy = 0;
   player.initY = 0;
@@ -193,7 +197,6 @@ var left = keyboard(37),  //Ascii keyboard bindings
     }
   };
 
- checkOutsideBoundary(player);
   //Set the game state
   state = play;
 
@@ -210,7 +213,6 @@ function gameLoop(){
   requestAnimationFrame(gameLoop);
  //Update the current game state:
   state();
- checkOutsideBoundary(player);
 //Render the stage
   renderer.render(stage);
 }
@@ -218,10 +220,29 @@ function gameLoop(){
 function play() {
 
   //Move the player 1 pixel to the right each frame
-  player.y += player.vy;
-  player.x += player.vx;
-  checkOutsideBoundary(player);
+  var newX = player.x + player.vx
+  var newY = player.y + player.vy
 
+  var lowerX = (newX - newX % 100) / 100
+  var upperX = (newX + 63 - (newX + 63) % 100) / 100
+  var lowerY = (newY - newY % 100) / 100
+  var upperY = (newY + 63 - (newY + 63) % 100) / 100
+
+  // newX = (newX - newX % 100) / 100
+  // newY = (newY - newY % 100) / 100
+
+  // console.log(grid[(newX - newX % 100) / 100][(newY - newY % 100) / 100] == 1)
+
+  if (newX >= 0 && upperX < x && newY >= 0 && upperY < y
+    && grid[lowerX][lowerY] == 1
+    && grid[lowerX][upperY] == 1
+    && grid[upperX][lowerY] == 1
+    && grid[upperX][upperY] == 1) {
+    // console.log(grid[gridX][gridY] == 1)
+    // console.log(newY)
+    player.x = newX
+    player.y = newY
+  }
 }
 
 
