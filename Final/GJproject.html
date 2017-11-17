@@ -48,8 +48,8 @@
 
 var player, state;
 var velocity=7.5;
-var boundary = {"top":0, "bottom":window.innerHeight, "left":0, "right":window.innerWidth-20};
-
+// -80 sind nicht die richtigen Werte, das hängt dann vom Endsprite player ab
+var boundary = {"top":0, "bottom":window.innerHeight-80, "left":0, "right":window.innerWidth-80};
 
 function keyboard(keyCode) {
   var key = {};
@@ -98,7 +98,9 @@ function isOutsideBoundary(player){
 function checkOutsideBoundary(player){
 	if(isOutsideBoundary(player) ){
 		
-		player.position.set(player.initX, player.initY);
+		//player.position.set(player.initX, player.initY);
+		player.x=player.x-player.vx;		
+		player.y=player.y-player.vy;
 		return true;
 	}
 	return false;
@@ -108,8 +110,8 @@ function setup() {
 
   //Create the `player` sprite 
   player = new Sprite(resources["images/cat.png"].texture);
-  player.y = 96;  	//Anfangs koordinaten
-  player.vx = 0;   // Anfangs geschwindigkeit
+  player.y = 96;  	//Anfangskoordinaten
+  player.vx = 0;   // Anfangsgeschwindigkeit
   player.vy = 0;
   player.initY = 96;
   player.initX=0;
@@ -167,6 +169,8 @@ var left = keyboard(37),  //Ascii keyboard bindings
     }
   };
 
+  
+
  checkOutsideBoundary(player);
   //Set the game state
   state = play;
@@ -192,9 +196,10 @@ function gameLoop(){
 function play() {
 
   //Move the player 1 pixel to the right each frame
+  checkOutsideBoundary(player);
   player.y += player.vy;
   player.x += player.vx;
-  checkOutsideBoundary(player);
+  
 
 }
 
