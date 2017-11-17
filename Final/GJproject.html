@@ -221,7 +221,8 @@ function isEnemyCollision(player,enemy){
 
 function checkEnemyCollision(player,enemy){
 	if(isEnemyCollision(player,enemy)){
-		player.position.set(player.initX, player.initY);
+		player.x=player.x-2*player.vx;		
+		player.y=player.y-2*player.vy;
 		return true;
 	}
 	return false;
