@@ -43,12 +43,19 @@
 	//load an image and run the `setup` function when it's done
 	loader
 	  .add("images/cat.png")
+	  .add("images/evil.png")
 	  .load(setup);
 	
 
-var player, state;
+var player,enemy, state;
 var velocity=7.5;
 var boundary = {"top":0, "bottom":window.innerHeight, "left":0, "right":window.innerWidth-20};
+
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 
 
 function keyboard(keyCode) {
@@ -59,6 +66,7 @@ function keyboard(keyCode) {
   key.press = undefined;
   key.release = undefined;
   //The `downHandler`
+  //ich stinke, ich bin nils.
   key.downHandler = function(event) {
     if (event.keyCode === key.code) {
       if (key.isUp && key.press) key.press();
@@ -113,7 +121,22 @@ function setup() {
   player.vy = 0;
   player.initY = 96;
   player.initX=0;
+  
+  
+  enemy = new Sprite(resources["images/evil.png"].texture);
+ var randomx = randomInt(0, window.innerWidth - enemy.width);
+//Give the blob a random y position
+    //(`randomInt` is a custom function - see below)
+   var randomy = randomInt(0, window.innerHeight - enemy.height);
+
+    //Set the blob's position
+  enemy.y = randomy; 
+  enemy.x = randomx; 
+  //Anfangs koordinaten
+ enemy.vx = 0;   // Anfangs geschwindigkeit
+  enemy.vy = 0;
   stage.addChild(player);
+  stage.addChild(enemy);
 
 var left = keyboard(37),  //Ascii keyboard bindings
      up = keyboard(38),
