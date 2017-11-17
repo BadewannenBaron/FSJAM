@@ -43,10 +43,11 @@
 	//load an image and run the `setup` function when it's done
 	loader
 	  .add("images/cat.png")
+	  .add("images/evil.png")
 	  .load(setup);
 	
 
-var player, state;
+var player,enemie, state;
 var velocity=7.5;
 var boundary = {"top":0, "bottom":window.innerHeight, "left":0, "right":window.innerWidth-20};
 
@@ -114,6 +115,11 @@ function setup() {
   player.initY = 96;
   player.initX=0;
   stage.addChild(player);
+  enemie = new Sprite(resources["images/evil.png"].texture);
+  player.y = 96; 
+  player.x = 96;//Anfangs koordinaten
+  player.vx = 0;   // Anfangs geschwindigkeit
+  player.vy = 0;
 
 var left = keyboard(37),  //Ascii keyboard bindings
      up = keyboard(38),
