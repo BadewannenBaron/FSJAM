@@ -42,6 +42,9 @@
 	//Create a container object called the `stage`
 	// Whatever you put inside the stage will be rendered on the canvas.
 	var stage = new Container(),
+	
+	
+
 
 	//definiert den renderer
 		renderer = autoDetectRenderer(256, 256);
@@ -53,12 +56,18 @@
 		//Add the canvas to the HTML document
 		document.body.appendChild(renderer.view);
 
+	
 	//load an image and run the `setup` function when it's done
+	function startGame(){
+	document.getElementById("intro").remove();
+	document.body.appendChild(renderer.view);
+	renderer.render(stage);
 	loader
 	  .add("images/cat.png")
 	  .add("images/evil.png")
 	  .load(setup);
 
+	}
 
 var player,enemy, state, tick=0;
 var velocity=7.5;
