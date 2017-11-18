@@ -141,14 +141,14 @@ function contain(sprite, container) {
 }
 
 
-function isOutsideBoundary(player){
-	/*if(player.x < (boundary.left)) return true;
-	if(player.y < (boundary.top)) return true;
-	if(player.x > (boundary.right)) return true;
-	if(player.y > (boundary.bottom)) return true;
+function isOutsideBoundary(entity){
+	/*if(entity.x < (boundary.left)) return true;
+	if(entity.y < (boundary.top)) return true;
+	if(entity.x > (boundary.right)) return true;
+	if(entity.y > (boundary.bottom)) return true;
 	*/
-	var newX = player.x + player.vx
-  var newY = player.y + player.vy
+	var newX = entity.x + entity.vx
+  var newY = entity.y + entity.vy
 
   var lowerX = (newX - newX % 100) / 100
   var upperX = (newX + 63 - (newX + 63) % 100) / 100
@@ -167,18 +167,18 @@ function isOutsideBoundary(player){
     && grid[upperX][upperY] == 1) {
      return false
   }
-  
-  
-	
+
+
+
 	return true;
 }
 
 
 function checkOutsideBoundary(player){
 	if(isOutsideBoundary(player) ){
-		
+
 		//player.position.set(player.initX, player.initY);
-		player.x=player.x-player.vx;		
+		player.x=player.x-player.vx;
 		player.y=player.y-player.vy;
 		return true;
 	}
@@ -232,7 +232,7 @@ function isEnemyCollision(player,enemy){
 
 function checkEnemyCollision(player,enemy){
 	if(isEnemyCollision(player,enemy,false)){
-		player.x=player.x-3*player.vx;		
+		player.x=player.x-3*player.vx;
 		player.y=player.y-3*player.vy;
 		return true;
 	}
@@ -259,7 +259,7 @@ function isPlayerCollision(player,enemy){
 
 function checkPlayerCollision(player,enemy){
 	if(isPlayerCollision(player,enemy,false)){
-		enemy.x=enemy.x-3*enemy.vx;		
+		enemy.x=enemy.x-3*enemy.vx;
 		enemy.y=enemy.y-3*enemy.vy;
 		return true;
 	}
@@ -289,8 +289,8 @@ function setup() {
       stage.addChild(rectangle);
     }
   }
-  
-  
+
+
 
 
 
@@ -309,12 +309,12 @@ var numberOfEnemies = 3,
     xOffset = 150,
     speed = 2,
     direction = 1;
-	
-	
+
+
 	for (var i = 0; i < numberOfEnemies; i++) {
 
   //Make a blob
-  
+
   enemy = new Sprite(resources["images/evil.png"].texture);
 
   //Space each blob horizontally according to the `spacing` value.
@@ -328,27 +328,27 @@ var randomx = randomInt(0, window.innerWidth - enemy.width);
   enemy.x = randomx;
   enemy.y =randomy;
 
-  
+
  /* enemy = new Sprite(resources["images/evil.png"].texture);
  var randomx = randomInt(0, window.innerWidth - enemy.width);
 //Give the enemy a random y position
     //(`randomInt` is a custom function - see below)
    var randomy = randomInt(0, window.innerHeight - enemy.height);
  //Set the enemy's position
-  enemy.y = randomy; 
+  enemy.y = randomy;
   enemy.x = randomx;*/
   enemy.vx = 0;   // Anfangsgeschwindigkeit
   enemy.vy = 0;
-  
+
   enemies.push(enemy);
   stage.addChild(enemy);
 }
-  
+
   //Anfangs koordinaten
-  
+
   stage.addChild(player);
-  
-  
+
+
    //Create the health bar
   healthBar = new Container();
   healthBar.position.set( 20, 6)
@@ -366,7 +366,7 @@ var randomx = randomInt(0, window.innerWidth - enemy.width);
   outerBar.endFill();
   healthBar.addChild(outerBar);
   healthBar.outer = outerBar;
-  
+
 var message = new Text(
   "Welle:",
   {fontFamily: "Arial", fontSize: 32, fill: "white"}
@@ -429,7 +429,7 @@ var left = keyboard(37),  //Ascii keyboard bindings
     }
   };
 
-  
+
 
  checkOutsideBoundary(player);
 
@@ -627,7 +627,7 @@ function gameLoop(){
  /* tick++
   if (tick ==60){
   tick =0;
-  
+
   enemymovement = direction();
  if (enemymovement==0){
  enemy.vx = -3;
@@ -641,9 +641,9 @@ function gameLoop(){
  if (enemymovement==3){
  enemy.vy = 3;
  enemy.vx = 0;}
-  
+
   }*/
-  
+
  //Update the current game state:
   state();
 //Render the stage
@@ -660,14 +660,14 @@ function play() {
  // checkOutsideBoundary(enemy);
 
   //checkEnemyCollision(player,enemy);
-  
+
   enemies.forEach(function(enemy) {
  // checkEnemyCollision(enemy,enemy);
  // checkEnemyCollision(player,enemy);
   checkPlayerCollision(player,enemy);
-  enemy.y += enemy.vy;
+    enemy.y += enemy.vy;
   enemy.x += enemy.vx;
-  
+
   var enemyHitsWall = contain(enemy, {x: 0, y: 0, width: 1000, height: 500});
     //If the enemy hits the top or bottom of th stage, reverse
     //its direction
@@ -677,7 +677,9 @@ function play() {
 	if (enemyHitsWall === "left" || enemyHitsWall === "right") {
       enemy.vy *= -1;
     }
-	});
-  
+    checkOutsideBoundary(enemy);
+	}
+);
+
 
 }
