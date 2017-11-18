@@ -56,7 +56,15 @@ function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-
+function direction(){
+var direc = undefined;
+var erg = Math.floor((Math.random() * 3) + 0);
+if (erg== 0){direc = "left";}
+if (erg== 1){direc = "right";}
+if (erg== 2){direc = "top";}
+if (erg== 3){direc = "bottom";}
+return erg;
+}
 
 function keyboard(keyCode) {
   var key = {};
@@ -66,7 +74,6 @@ function keyboard(keyCode) {
   key.press = undefined;
   key.release = undefined;
   //The `downHandler`
-  //ich stinke, ich bin nils.
   key.downHandler = function(event) {
     if (event.keyCode === key.code) {
       if (key.isUp && key.press) key.press();
@@ -127,16 +134,26 @@ function setup() {
   
   enemy = new Sprite(resources["images/evil.png"].texture);
  var randomx = randomInt(0, window.innerWidth - enemy.width);
-//Give the blob a random y position
+//Give the enemy a random y position
     //(`randomInt` is a custom function - see below)
    var randomy = randomInt(0, window.innerHeight - enemy.height);
-
-    //Set the blob's position
+ //Set the enemy's position
   enemy.y = randomy; 
-  enemy.x = randomx; 
-  //Anfangs koordinaten
- enemy.vx = 0;   // Anfangs geschwindigkeit
+  enemy.x = randomx;
+  enemy.vx = 0;   // Anfangsgeschwindigkeit
   enemy.vy = 0;
+  
+  //Anfangs koordinaten
+enemymovement = direction();
+ if (enemymovement==0){
+ enemy.vx = -5;}   // Anfangs geschwindigkeit
+ if (enemymovement==1){
+ enemy.vx = 5;}
+ if (enemymovement==2){
+ enemy.vy = -5;}
+ if (enemymovement==3){
+ enemy.vy = 5;}
+  
   stage.addChild(player);
   stage.addChild(enemy);
 
@@ -246,6 +263,26 @@ function play() {
   checkEnemyCollision(player,enemy);
   player.y += player.vy;
   player.x += player.vx;
+  enemy.y += enemy.vy;
+  enemy.x += enemy.vx;
+  
+/*function(enemy) {
+    //Move the enemy
+    enemy.y += enemy.vy;
+    //Check the enemy's screen boundaries
+    var enemyHitsWall = contain(enemy, {x: 28, y: 10, width: 488, height: 480});
+    //If the enemy hits the top or bottom of the stage, reverse
+    //its direction
+    if (enemyHitsWall === "top" || enemyHitsWall === "bottom") {
+      enemy.vy *= -1;
+    }
+    //Test for a collision. If any of the enemies are touching
+    //the explorer, set `explorerHit` to `true`
+    if(hitTestRectangle(explorer, enemy)) {
+      explorerHit = true;
+    }
+  };*/
+  
   
 
 }
@@ -254,6 +291,3 @@ function play() {
 </script>
 </body>
 </html>
-
-
-
