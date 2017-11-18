@@ -1,17 +1,4 @@
-<!doctype html>
-<html>
-<head>
-  <style> body{margin:0;}</style>
-  <meta charset="utf-8">
-  <title>TOLLER GJ TITEL</title>
-</head>
-  <script src="pixi.min.js"></script>
-<body>
-
-  <script type="text/javascript">
-
-
-  var x = 10
+ var x = 10
   var y = 5
   var grid = new Array(x)
 
@@ -226,7 +213,7 @@ s.vy=2}
 
 }
 
-function isEnemyCollision(player,enemy){
+/*function isEnemyCollision(player,enemy){
 	if((player.x>enemy.x)&&(player.x<(enemy.x+64))&&((player.y>enemy.y)&&(player.y<(enemy.y+64)))){
 		return true;
 	}
@@ -244,16 +231,17 @@ function isEnemyCollision(player,enemy){
 
 
 function checkEnemyCollision(player,enemy){
-	if(isEnemyCollision(player,enemy)){
-		player.x=player.x-2*player.vx;		
-		player.y=player.y-2*player.vy;
+	if(isEnemyCollision(player,enemy,false)){
+		player.x=player.x-3*player.vx;		
+		player.y=player.y-3*player.vy;
 		return true;
 	}
 	return false;
 }
 
-
+*/
 var enemies = [];
+var healthBar;
 
 function setup() {
 
@@ -333,7 +321,33 @@ var randomx = randomInt(0, window.innerWidth - enemy.width);
   //Anfangs koordinaten
   
   stage.addChild(player);
+  
+  
+   //Create the health bar
+  healthBar = new Container();
+  healthBar.position.set( 20, 6)
+  stage.addChild(healthBar);
+  //Create the black background rectangle
+  var innerBar = new Graphics();
+  innerBar.beginFill(0x000000);
+  innerBar.drawRect(0, 0, 150, 15);
+  innerBar.endFill();
+  healthBar.addChild(innerBar);
+  //Create the front red rectangle
+  var outerBar = new Graphics();
+  outerBar.beginFill(0xFF3300);
+  outerBar.drawRect(0, 0, 150, 15);
+  outerBar.endFill();
+  healthBar.addChild(outerBar);
+  healthBar.outer = outerBar;
+  
+var message = new Text(
+  "Welle:",
+  {fontFamily: "Arial", fontSize: 32, fill: "white"}
+);
 
+message.position.set(stage.width - 70, 6);
+stage.addChild(message);
 
 
 
@@ -451,7 +465,7 @@ function isEnemyCollision(player,enemy){
 	return false;
 }
 
-/*function checkEnemyCollision(player, enemy) {
+function checkEnemyCollision(player, enemy) {
   var backoff = 0;
   switch(spriteIntersectionDirection2(player, enemy)) {
     case Side.TOP:
@@ -472,6 +486,105 @@ function isEnemyCollision(player,enemy){
         return false;
   }
   return true;
+}
+
+/*function isEnemyCollision( first, other, isCentred )
+{
+
+	x=first.x
+	y=first.y
+	x2=other.x
+	y2=other.y
+    // we need to avoid using floats, as were doing array lookups
+    x  = Math.round( x );
+    y  = Math.round( y );
+    x2 = Math.round( x2 );
+    y2 = Math.round( y2 );
+
+    var w  = first.width,
+        h  = first.height,
+        w2 = other.width,
+        h2 = other.height ;
+
+    // deal with the image being centred
+    if ( isCentred ) {
+        // fast rounding, but positive only
+        x  -= ( w/2 + 0.5) << 0
+        y  -= ( h/2 + 0.5) << 0
+        x2 -= (w2/2 + 0.5) << 0
+        y2 -= (h2/2 + 0.5) << 0
+    }
+
+    // find the top left and bottom right corners of overlapping area
+    var xMin = Math.max( x, x2 ),
+        yMin = Math.max( y, y2 ),
+        xMax = Math.min( x+w, x2+w2 ),
+        yMax = Math.min( y+h, y2+h2 );
+
+    // Sanity collision check, we ensure that the top-left corner is both
+    // above and to the left of the bottom-right corner.
+    if ( xMin >= xMax || yMin >= yMax ) {
+        return false;
+    }
+
+    var xDiff = xMax - xMin,
+        yDiff = yMax - yMin;
+
+    // get the pixels out from the images
+    var pixels  = first.data,
+        pixels2 = other.data;
+
+    // if the area is really small,
+    // then just perform a normal image collision check
+    if ( xDiff < 4 && yDiff < 4 ) {
+        for ( var pixelX = xMin; pixelX < xMax; pixelX++ ) {
+            for ( var pixelY = yMin; pixelY < yMax; pixelY++ ) {
+                if (
+                        ( pixels [ ((pixelX-x ) + (pixelY-y )*w )*4 + 3 ] !== 0 ) &&
+                        ( pixels2[ ((pixelX-x2) + (pixelY-y2)*w2)*4 + 3 ] !== 0 )
+                ) {
+                    return true;
+                }
+            }
+        }
+    } else {
+        /* What is this doing?
+         * It is iterating over the overlapping area,
+         * across the x then y the,
+         * checking if the pixels are on top of this.
+         *
+         * What is special is that it increments by incX or incY,
+         * allowing it to quickly jump across the image in large increments
+         * rather then slowly going pixel by pixel.
+         *
+         * This makes it more likely to find a colliding pixel early.
+         */
+
+        // Work out the increments,
+        // it's a third, but ensure we don't get a tiny
+        // slither of an area for the last iteration (using fast ceil).*/
+      /*  var incX = xDiff / 3.0,
+            incY = yDiff / 3.0;
+        incX = (~~incX === incX) ? incX : (incX+1 | 0);
+        incY = (~~incY === incY) ? incY : (incY+1 | 0);
+
+        for ( var offsetY = 0; offsetY < incY; offsetY++ ) {
+            for ( var offsetX = 0; offsetX < incX; offsetX++ ) {
+                for ( var pixelY = yMin+offsetY; pixelY < yMax; pixelY += incY ) {
+                    for ( var pixelX = xMin+offsetX; pixelX < xMax; pixelX += incX ) {
+                        if (
+                                ( pixels [ ((pixelX-x ) + (pixelY-y )*w )*4 + 3 ] !== 0 ) &&
+                                ( pixels2[ ((pixelX-x2) + (pixelY-y2)*w2)*4 + 3 ] !== 0 )
+                        ) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
 }*/
 
 function gameLoop(){
@@ -512,7 +625,10 @@ function gameLoop(){
 }
 
 function play() {
-
+ checkOutsideBoundary(player);
+ checkEnemyCollision(player,enemy);
+  player.y += player.vy;
+  player.x += player.vx;
 
   checkOutsideBoundary(player);
  // checkOutsideBoundary(enemy);
@@ -520,11 +636,8 @@ function play() {
   //checkEnemyCollision(player,enemy);
   
   enemies.forEach(function(enemy) {
+ // checkEnemyCollision(enemy,enemy);
  // checkEnemyCollision(player,enemy);
- checkOutsideBoundary(player);
- checkEnemyCollision(player,enemy);
-  player.y += player.vy;
-  player.x += player.vx;
   enemy.y += enemy.vy;
   enemy.x += enemy.vx;
   
@@ -541,8 +654,3 @@ function play() {
   
 
 }
-
-
-</script>
-</body>
-</html>
