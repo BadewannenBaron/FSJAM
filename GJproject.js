@@ -1,18 +1,13 @@
+
+// Global variables, one dead kitten for each one
 var x = 10
 var y = 5
 var grid = new Array(x)
-
-for (i = 0; i < x; i++) {
-    grid[i] = new Array(y)
-    for (j = 0; j < y; j++) {
-        grid[i][j] = 1
-    }
-    // console.log(i + ": " + grid[i]);
-}
-grid[2][2] = 0
-grid[2][3] = 0
-grid[3][2] = 0
-
+var player, state, tick = 0;
+var velocity = 7.5;
+var enemies = [];
+var metals = [];
+var healthBar;
 
 var Side = {
     NONE: 0,
@@ -32,8 +27,6 @@ var Container = PIXI.Container,
     Text = PIXI.Text,
     Graphics = PIXI.Graphics;
 
-
-
 var type = "WebGL"
 if (!PIXI.utils.isWebGLSupported()) {
     type = "canvas";
@@ -41,13 +34,10 @@ if (!PIXI.utils.isWebGLSupported()) {
 
 //Create a container object called the `stage`
 // Whatever you put inside the stage will be rendered on the canvas.
-var stage = new Container(),
+var stage = new Container();
 
-
-
-
-    //definiert den renderer
-    renderer = autoDetectRenderer(256, 256);
+//definiert den renderer
+renderer = autoDetectRenderer(256, 256);
 renderer.backgroundColor = 0x061639;
 renderer.view.style.position = "absolute";
 renderer.view.style.display = "block";
@@ -55,7 +45,6 @@ renderer.autoResize = true;
 renderer.resize(window.innerWidth, window.innerHeight);
 //Add the canvas to the HTML document
 document.body.appendChild(renderer.view);
-
 
 //load an image and run the `setup` function when it's done
 function startGame() {
@@ -65,12 +54,10 @@ function startGame() {
     loader
         .add("images/cat.png")
         .add("images/evil.png")
+        .add("images/metal.png")
         .load(setup);
-
 }
 
-var player, enemy, state, tick = 0;
-var velocity = 7.5;
 // -80 sind nicht die richtigen Werte, das hängt dann vom Endsprite player ab
 var boundary = {
     "top": 0,
@@ -201,14 +188,14 @@ function sidestep(sprite1, sprite2) {
 }
 
 
-function isOutsideBoundary(player) {
-    var newX = player.x + player.vx
-    var newY = player.y + player.vy
+function isOutsideBoundary(entity) {
+    var newX = entity.x + entity.vx
+    var newY = entity.y + entity.vy
 
     var lowerX = (newX - newX % 100) / 100
-    var upperX = (newX + 63 - (newX + 63) % 100) / 100
+    var upperX = (newX + entity.width-1 - (newX + entity.width-1) % 100) / 100
     var lowerY = (newY - newY % 100) / 100
-    var upperY = (newY + 63 - (newY + 63) % 100) / 100
+    var upperY = (newY + entity.height-1 - (newY + entity.height-1) % 100) / 100
 
     if (newX >= 0 && upperX < x && newY >= 0 && upperY < y &&
         grid[lowerX][lowerY] == 1 &&
@@ -229,13 +216,11 @@ function checkOutsideBoundary(player) {
         player.y = player.y - player.vy;
         return true;
     }
-
     return false;
 }
 
 
 function autofinder(s, t, richtung) {
-
     dx = t.x - s.x;
     dy = t.y - s.y;
     //richtung= richtung%2;
@@ -261,7 +246,8 @@ function autofinder(s, t, richtung) {
     }
 }
 
-function isEnemyCollision(player, enemy) {
+
+function isPlayerEnemyCollision(player, enemy) {
     if ((player.x > enemy.x) && (player.x < (enemy.x + 64)) && ((player.y > enemy.y) && (player.y < (enemy.y + 64)))) {
         return true;
     } else if (((player.x + 64) > enemy.x) && ((player.x + 64) < (enemy.x + 64)) && ((player.y > enemy.y) && (player.y < (enemy.y + 64)))) {
@@ -271,71 +257,66 @@ function isEnemyCollision(player, enemy) {
     } else if (((player.x + 64) > enemy.x) && ((player.x + 64) < (enemy.x + 64)) && (((player.y + 64) > enemy.y) && ((player.y + 64) < (enemy.y + 64)))) {
         return true;
     }
-
     return false;
 }
 
 
-function checkEnemyCollision(player, enemy) {
-    if (isEnemyCollision(player, enemy, false)) {
-        player.x = player.x - 3 * player.vx;
-        player.y = player.y - 3 * player.vy;
+function checkPlayerEnemyCollision(player, enemy) {
+    // if (isPlayerEnemyCollision(player, enemy)) {
+    //     player.x = player.x - 3 * player.vx;
+    //     player.y = player.y - 3 * player.vy;
+    //     return true;
+    // }
+    // return false;
+    if (isPlayerEnemyCollision(player, enemy)) {
+        replaceEnemyByMetal(enemy);
         return true;
     }
     return false;
 }
 
-
-function isPlayerCollision(player, enemy) {
-    if ((player.x > enemy.x) && (player.x < (enemy.x + 64)) && ((player.y > enemy.y) && (player.y < (enemy.y + 64)))) {
-        return true;
-    } else if (((player.x + 64) > enemy.x) && ((player.x + 64) < (enemy.x + 64)) && ((player.y > enemy.y) && (player.y < (enemy.y + 64)))) {
-        return true;
-    } else if ((player.x > enemy.x) && (player.x < (enemy.x + 64)) && (((player.y + 64) > enemy.y) && ((player.y + 64) < (enemy.y + 64)))) {
-        return true;
-    } else if (((player.x + 64) > enemy.x) && ((player.x + 64) < (enemy.x + 64)) && (((player.y + 64) > enemy.y) && ((player.y + 64) < (enemy.y + 64)))) {
-        return true;
+function replaceEnemyByMetal(enemy) {
+    if (isPlayerEnemyCollision(player, enemy)) {
+        stage.removeChild(enemy)
+        enemies.splice(enemies.indexOf(enemy), 1);
+        var metl = new Sprite(resources["images/metal.png"].texture);
+        metl.x = enemy.x;
+        metl.y = enemy.y;
+        metl.vx = 0;
+        metl.vy = 0;
+        metals.push(metl);
+        stage.addChild(metl);
     }
-
-    return false;
 }
 
-
-function checkPlayerCollision(player, enemy) {
-    if (isPlayerCollision(player, enemy, false)) {
-        enemy.x = enemy.x - 3 * enemy.vx;
-        enemy.y = enemy.y - 3 * enemy.vy;
-        return true;
-    }
-    return false;
-}
-
-var enemies = [];
-var healthBar;
 
 function setup() {
+
+    // setup grid (level)
+    for (i = 0; i < x; i++) {
+        grid[i] = new Array(y)
+        for (j = 0; j < y; j++) {
+            grid[i][j] = 1
+        }
+        // console.log(i + ": " + grid[i]);
+    }
+    grid[2][2] = grid[2][3] = grid[3][2] = 0
 
     for (i = 0; i < x; i++) {
         for (j = 0; j < y; j++) {
             if (grid[i][j] == 0) {
                 continue
             }
-
             var rectangle = new Graphics();
-            // rectangle.lineStyle(4, 0xFF3300, 1);
-
+            //rectangle.lineStyle(4, 0xFF3300, 1);
             rectangle.beginFill(0x66CCFF);
             rectangle.drawRect(0, 0, 100, 100);
             rectangle.endFill();
-
             rectangle.x = 100 * i
             rectangle.y = 100 * j
             stage.addChild(rectangle);
         }
     }
-
-
-
 
     //Create the `player` sprite
     player = new Sprite(resources["images/cat.png"].texture);
@@ -357,8 +338,7 @@ function setup() {
     for (var i = 0; i < numberOfEnemies; i++) {
 
         //Make a blob
-
-        enemy = new Sprite(resources["images/evil.png"].texture);
+        var enemy = new Sprite(resources["images/evil.png"].texture);
 
         //Space each blob horizontally according to the `spacing` value.
         //`xOffset` determines the point from the left of the screen
@@ -370,7 +350,6 @@ function setup() {
         //Set the blob's position
         enemy.x = randomx;
         enemy.y = randomy;
-
 
         /* enemy = new Sprite(resources["images/evil.png"].texture);
         var randomx = randomInt(0, window.innerWidth - enemy.width);
@@ -387,10 +366,8 @@ function setup() {
         stage.addChild(enemy);
     }
 
-    //Anfangs koordinaten
-
+    // Anfangskoordinaten
     stage.addChild(player);
-
 
     //Create the health bar
     healthBar = new Container();
@@ -417,11 +394,8 @@ function setup() {
             fill: "white"
         }
     );
-    4
     message.position.set(window.innerWidth - 170, 6);
     stage.addChild(message);
-
-
 
     var left = keyboard(37), //Ascii keyboard bindings
         up = keyboard(38),
@@ -475,8 +449,6 @@ function setup() {
         }
     };
 
-
-
     checkOutsideBoundary(player);
 
     //Set the game state
@@ -521,144 +493,6 @@ function spriteIntersectionDirection2(a, b) {
         return Side.LEFT;
 }
 
-/*function isEnemyCollision(player,enemy){
-if((player.x>enemy.x)&&(player.x<(enemy.x+64))&&((player.y>enemy.y)&&(player.y<(enemy.y+64)))){
-return true;
-}
-else if(((player.x+64)>enemy.x)&&((player.x+64)<(enemy.x+64))&&((player.y>enemy.y)&&(player.y<(enemy.y+64)))){
-return true;
-}
-else if((player.x>enemy.x)&&(player.x<(enemy.x+64))&&(((player.y+64)>enemy.y)&&((player.y+64)<(enemy.y+64)))){
-return true;
-}
-else if(((player.x+64)>enemy.x)&&((player.x+64)<(enemy.x+64))&&(((player.y+64)>enemy.y)&&((player.y+64)<(enemy.y+64)))){
-return true;
-}
-return false;
-}
-*/
-/*function checkEnemyCollision(player, enemy) {
-var backoff = 0;
-switch(spriteIntersectionDirection2(player, enemy)) {
-case Side.TOP:
-player.y -= backoff;
-break;
-case Side.LEFT:
-player.x -= backoff;
-break;
-case Side.BOTTOM:
-player.y += backoff;
-break;
-case Side.RIGHT:
-player.x += backoff;
-break;
-case Side.NONE:
-default:
-// no collision
-return false;
-}
-return true;
-}
-*/
-/*function isEnemyCollision( first, other, isCentred )
-{
-
-x=first.x
-y=first.y
-x2=other.x
-y2=other.y
-// we need to avoid using floats, as were doing array lookups
-x  = Math.round( x );
-y  = Math.round( y );
-x2 = Math.round( x2 );
-y2 = Math.round( y2 );
-
-var w  = first.width,
-h  = first.height,
-w2 = other.width,
-h2 = other.height ;
-
-// deal with the image being centred
-if ( isCentred ) {
-// fast rounding, but positive only
-x  -= ( w/2 + 0.5) << 0
-y  -= ( h/2 + 0.5) << 0
-x2 -= (w2/2 + 0.5) << 0
-y2 -= (h2/2 + 0.5) << 0
-}
-
-// find the top left and bottom right corners of overlapping area
-var xMin = Math.max( x, x2 ),
-yMin = Math.max( y, y2 ),
-xMax = Math.min( x+w, x2+w2 ),
-yMax = Math.min( y+h, y2+h2 );
-
-// Sanity collision check, we ensure that the top-left corner is both
-// above and to the left of the bottom-right corner.
-if ( xMin >= xMax || yMin >= yMax ) {
-return false;
-}
-
-var xDiff = xMax - xMin,
-yDiff = yMax - yMin;
-
-// get the pixels out from the images
-var pixels  = first.data,
-pixels2 = other.data;
-
-// if the area is really small,
-// then just perform a normal image collision check
-if ( xDiff < 4 && yDiff < 4 ) {
-for ( var pixelX = xMin; pixelX < xMax; pixelX++ ) {
-for ( var pixelY = yMin; pixelY < yMax; pixelY++ ) {
-if (
-( pixels [ ((pixelX-x ) + (pixelY-y )*w )*4 + 3 ] !== 0 ) &&
-( pixels2[ ((pixelX-x2) + (pixelY-y2)*w2)*4 + 3 ] !== 0 )
-) {
-return true;
-}
-}
-}
-} else {
-/* What is this doing?
-* It is iterating over the overlapping area,
-* across the x then y the,
-* checking if the pixels are on top of this.
-*
-* What is special is that it increments by incX or incY,
-* allowing it to quickly jump across the image in large increments
-* rather then slowly going pixel by pixel.
-*
-* This makes it more likely to find a colliding pixel early.
-*/
-
-// Work out the increments,
-// it's a third, but ensure we don't get a tiny
-// slither of an area for the last iteration (using fast ceil).*/
-/*  var incX = xDiff / 3.0,
-incY = yDiff / 3.0;
-incX = (~~incX === incX) ? incX : (incX+1 | 0);
-incY = (~~incY === incY) ? incY : (incY+1 | 0);
-
-for ( var offsetY = 0; offsetY < incY; offsetY++ ) {
-for ( var offsetX = 0; offsetX < incX; offsetX++ ) {
-for ( var pixelY = yMin+offsetY; pixelY < yMax; pixelY += incY ) {
-for ( var pixelX = xMin+offsetX; pixelX < xMax; pixelX += incX ) {
-if (
-        ( pixels [ ((pixelX-x ) + (pixelY-y )*w )*4 + 3 ] !== 0 ) &&
-        ( pixels2[ ((pixelX-x2) + (pixelY-y2)*w2)*4 + 3 ] !== 0 )
-) {
-    return true;
-}
-}
-}
-}
-}
-}
-
-return false;
-}*/
-
 function gameLoop() {
 
     //Loop this function 60 times per second
@@ -672,25 +506,30 @@ function gameLoop() {
         });
     }
 
-    /* tick++
-    if (tick ==60){
-    tick =0;
+/*
+    tick++
+    if (tick == 60) {
+        tick = 0;
 
-    enemymovement = direction();
-    if (enemymovement==0){
-    enemy.vx = -3;
-    enemy.vy = 0;}   // Anfangs geschwindigkeit
-    if (enemymovement==1){
-    enemy.vx = 3;
-    enemy.vy = 0;}
-    if (enemymovement==2){
-    enemy.vy = -3;
-    enemy.vx = 0;}
-    if (enemymovement==3){
-    enemy.vy = 3;
-    enemy.vx = 0;}
-
-    }*/
+        enemymovement = direction();
+        if (enemymovement==0){
+            enemy.vx = -3;
+            enemy.vy = 0;
+        }   // Anfangsgeschwindigkeit
+        if (enemymovement==1){
+            enemy.vx = 3;
+            enemy.vy = 0;
+        }
+        if (enemymovement==2){
+            enemy.vy = -3;
+            enemy.vx = 0;
+        }
+        if (enemymovement==3){
+            enemy.vy = 3;
+            enemy.vx = 0;}
+        }
+    }
+*/
 
     //Update the current game state:
     state();
@@ -699,25 +538,18 @@ function gameLoop() {
 }
 
 function play() {
-    checkOutsideBoundary(player);
-    checkEnemyCollision(player, enemy);
     player.y += player.vy;
     player.x += player.vx;
-
-    //checkOutsideBoundary(player);
-    // checkOutsideBoundary(enemy);
-
-    //checkEnemyCollision(player,enemy);
+    checkOutsideBoundary(player);
+    //checkOutsideBoundary(enemy);
 
     //for(var i in enemies){
     enemies.forEach(function(enemy) {
         // checkEnemyCollision(enemy,enemy);
         // checkEnemyCollision(player,enemy);
-
         //enemy = enemies[i];
 
-
-        checkPlayerCollision(player, enemy);
+        checkPlayerEnemyCollision(player, enemy);
         enemy.y += enemy.vy;
         enemy.x += enemy.vx;
 
@@ -729,19 +561,15 @@ function play() {
         });
         //If the enemy hits the top or bottom of th stage, reverse
         //its direction
-        if (enemyHitsWall === "top" || enemyHitsWall === "bottom") {
+        if (enemyHitsWall === "top" || enemyHitsWall === "bottom")
             enemy.vy *= -1;
-        }
-        if (enemyHitsWall === "left" || enemyHitsWall === "right") {
+        if (enemyHitsWall === "left" || enemyHitsWall === "right")
             enemy.vx *= -1;
-        }
-
 
         //3 ist Anzahl der Enemies, global geben!
         enemies.forEach(function(enemy2) {
             //var enemy2 = enemies[j];
             var enemyNearEnemy = sidestep(enemy, enemy2);
-
             if ((enemyNearEnemy == true) && (enemy != enemy2)) {
                 enemy.vy *= -1;
                 enemy2.vx *= -1;
@@ -750,9 +578,7 @@ function play() {
                 enemy.vx *= -1;
                 enemy2.vy *= -1;
             }
-
         });
         //}
     });
-
 }
