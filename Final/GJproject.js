@@ -213,7 +213,7 @@ s.vy=2}
 
 }
 
-/*function isEnemyCollision(player,enemy){
+function isEnemyCollision(player,enemy){
 	if((player.x>enemy.x)&&(player.x<(enemy.x+64))&&((player.y>enemy.y)&&(player.y<(enemy.y+64)))){
 		return true;
 	}
@@ -239,7 +239,33 @@ function checkEnemyCollision(player,enemy){
 	return false;
 }
 
-*/
+
+function isPlayerCollision(player,enemy){
+	if((player.x>enemy.x)&&(player.x<(enemy.x+64))&&((player.y>enemy.y)&&(player.y<(enemy.y+64)))){
+		return true;
+	}
+	else if(((player.x+64)>enemy.x)&&((player.x+64)<(enemy.x+64))&&((player.y>enemy.y)&&(player.y<(enemy.y+64)))){
+		return true;
+	}
+	else if((player.x>enemy.x)&&(player.x<(enemy.x+64))&&(((player.y+64)>enemy.y)&&((player.y+64)<(enemy.y+64)))){
+		return true;
+	}
+	else if(((player.x+64)>enemy.x)&&((player.x+64)<(enemy.x+64))&&(((player.y+64)>enemy.y)&&((player.y+64)<(enemy.y+64)))){
+		return true;
+	}
+	return false;
+}
+
+
+function checkPlayerCollision(player,enemy){
+	if(isPlayerCollision(player,enemy,false)){
+		enemy.x=enemy.x-3*enemy.vx;		
+		enemy.y=enemy.y-3*enemy.vy;
+		return true;
+	}
+	return false;
+}
+
 var enemies = [];
 var healthBar;
 
@@ -345,8 +371,8 @@ var message = new Text(
   "Welle:",
   {fontFamily: "Arial", fontSize: 32, fill: "white"}
 );
-
-message.position.set(stage.width - 70, 6);
+4
+message.position.set(window.innerWidth -170, 6);
 stage.addChild(message);
 
 
@@ -449,7 +475,7 @@ function spriteIntersectionDirection2(a, b) {
     return Side.LEFT;
 }
 
-function isEnemyCollision(player,enemy){
+/*function isEnemyCollision(player,enemy){
 	if((player.x>enemy.x)&&(player.x<(enemy.x+64))&&((player.y>enemy.y)&&(player.y<(enemy.y+64)))){
 		return true;
 	}
@@ -464,8 +490,8 @@ function isEnemyCollision(player,enemy){
 	}
 	return false;
 }
-
-function checkEnemyCollision(player, enemy) {
+*/
+/*function checkEnemyCollision(player, enemy) {
   var backoff = 0;
   switch(spriteIntersectionDirection2(player, enemy)) {
     case Side.TOP:
@@ -487,7 +513,7 @@ function checkEnemyCollision(player, enemy) {
   }
   return true;
 }
-
+*/
 /*function isEnemyCollision( first, other, isCentred )
 {
 
@@ -630,7 +656,7 @@ function play() {
   player.y += player.vy;
   player.x += player.vx;
 
-  checkOutsideBoundary(player);
+  //checkOutsideBoundary(player);
  // checkOutsideBoundary(enemy);
 
   //checkEnemyCollision(player,enemy);
@@ -638,6 +664,7 @@ function play() {
   enemies.forEach(function(enemy) {
  // checkEnemyCollision(enemy,enemy);
  // checkEnemyCollision(player,enemy);
+  checkPlayerCollision(player,enemy);
   enemy.y += enemy.vy;
   enemy.x += enemy.vx;
   
