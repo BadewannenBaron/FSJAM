@@ -226,6 +226,33 @@ s.vy=2}
 
 }
 
+function isEnemyCollision(player,enemy){
+	if((player.x>enemy.x)&&(player.x<(enemy.x+64))&&((player.y>enemy.y)&&(player.y<(enemy.y+64)))){
+		return true;
+	}
+	else if(((player.x+64)>enemy.x)&&((player.x+64)<(enemy.x+64))&&((player.y>enemy.y)&&(player.y<(enemy.y+64)))){
+		return true;
+	}
+	else if((player.x>enemy.x)&&(player.x<(enemy.x+64))&&(((player.y+64)>enemy.y)&&((player.y+64)<(enemy.y+64)))){
+		return true;
+	}
+	else if(((player.x+64)>enemy.x)&&((player.x+64)<(enemy.x+64))&&(((player.y+64)>enemy.y)&&((player.y+64)<(enemy.y+64)))){
+		return true;
+	}
+	return false;
+}
+
+
+function checkEnemyCollision(player,enemy){
+	if(isEnemyCollision(player,enemy)){
+		player.x=player.x-2*player.vx;		
+		player.y=player.y-2*player.vy;
+		return true;
+	}
+	return false;
+}
+
+
 var enemies = [];
 
 function setup() {
@@ -424,7 +451,7 @@ function isEnemyCollision(player,enemy){
 	return false;
 }
 
-function checkEnemyCollision(player, enemy) {
+/*function checkEnemyCollision(player, enemy) {
   var backoff = 0;
   switch(spriteIntersectionDirection2(player, enemy)) {
     case Side.TOP:
@@ -445,7 +472,7 @@ function checkEnemyCollision(player, enemy) {
         return false;
   }
   return true;
-}
+}*/
 
 function gameLoop(){
 
@@ -489,12 +516,15 @@ function play() {
 
   checkOutsideBoundary(player);
  // checkOutsideBoundary(enemy);
- // checkEnemyCollision(player,enemy);
-  player.y += player.vy;
-  player.x += player.vx;
+
+  //checkEnemyCollision(player,enemy);
   
   enemies.forEach(function(enemy) {
-  checkEnemyCollision(player,enemy);
+ // checkEnemyCollision(player,enemy);
+ checkOutsideBoundary(player);
+ checkEnemyCollision(player,enemy);
+  player.y += player.vy;
+  player.x += player.vx;
   enemy.y += enemy.vy;
   enemy.x += enemy.vx;
   
