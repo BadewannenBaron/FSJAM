@@ -23,10 +23,10 @@
   };
 
 
-	//Aliases
-	var Container = PIXI.Container,
-   	    autoDetectRenderer = PIXI.autoDetectRenderer,
-    	    loader = PIXI.loader,
+//Aliases
+var Container = PIXI.Container,
+       autoDetectRenderer = PIXI.autoDetectRenderer,
+        loader = PIXI.loader,
             resources = PIXI.loader.resources,
             Sprite = PIXI.Sprite,
             Text = PIXI.Text,
@@ -34,10 +34,10 @@
 
 
 
-	var type = "WebGL"
-	 	if(!PIXI.utils.isWebGLSupported()){
-	 		type = "canvas";
-	 	}
+var type = "WebGL"
+ if(!PIXI.utils.isWebGLSupported()){
+ type = "canvas";
+ }
 
 	//Create a container object called the `stage`
 	// Whatever you put inside the stage will be rendered on the canvas.
@@ -114,6 +114,7 @@ function keyboard(keyCode) {
   return key;
 }
 
+//Da fehlt die jeweils andere Ecke (die wird dann nicht getestet)
 function contain(sprite, container) {
   var collision = undefined;
   //Left
@@ -138,6 +139,36 @@ function contain(sprite, container) {
   }
   //Return the `collision` value
   return collision;
+}
+
+//Monster-mit-Monster-Kollision
+function sidestep(sprite1,sprite2){
+    var meet = undefined;
+
+    //Mini-Test, da kann eigentlich nichts schief gehen
+    if(sprite1.x < sprite2.x){
+      meet = true;
+    }
+    /*
+    //eigentlicher Code, woran auch immer es scheitert
+    if((sprite1.x+64)>sprite2.x && (sprite1.x+64)<(sprite2.x+64) 
+      && sprite1.y>sprite2.y && sprite1.y<(sprite2.y+64)) {
+      meet = true;
+    }
+    
+    if((sprite2.x+64)>sprite1.x && (sprite2.x+64)<(sprite1.x+64) 
+      && sprite2.y>sprite1.y && sprite2.y<(sprite1.y+64)) { 
+        meet = true;
+    }
+
+    if(sprite1.x>sprite2.x && sprite1.x<(sprite2.x+64) 
+     && sprite1.y>sprite2.y && sprite1.y<(sprite2.y+64)){
+      meet = true;
+    } 
+    if(sprite2.x>sprite1.x && sprite2.x<(sprite1.x+64) && sprite2.y>sprite1.y && sprite2.y<(sprite1.y+64)) {
+        meet = true;
+    }*/
+    return meet;
 }
 
 
@@ -661,23 +692,45 @@ function play() {
 
   //checkEnemyCollision(player,enemy);
   
+  //for(var i in enemies){
   enemies.forEach(function(enemy) {
  // checkEnemyCollision(enemy,enemy);
  // checkEnemyCollision(player,enemy);
+
+  //enemy = enemies[i];
+
+  
   checkPlayerCollision(player,enemy);
   enemy.y += enemy.vy;
   enemy.x += enemy.vx;
   
   var enemyHitsWall = contain(enemy, {x: 0, y: 0, width: 1000, height: 500});
-    //If the enemy hits the top or bottom of th stage, reverse
+//If the enemy hits the top or bottom of th stage, reverse
     //its direction
     if (enemyHitsWall === "top" || enemyHitsWall === "bottom") {
       enemy.vy *= -1;
     }
-	if (enemyHitsWall === "left" || enemyHitsWall === "right") {
-      enemy.vy *= -1;
+	  if (enemyHitsWall === "left" || enemyHitsWall === "right") {
+      enemy.vx *= -1;
     }
-	});
   
+  
+  //3 ist Anzahl der Enemies, global geben!
+  enemies.forEach(function(enemy2) {  
+    //var enemy2 = enemies[j];
+    var enemyNearEnemy = sidestep(enemy,enemy2);
+
+  if ((enemyNearEnemy == true) && (enemy!=enemy2)){
+    enemy.vy *= -1;
+    enemy2.vx *= -1;
+  }
+  if ((enemyNearEnemy == true) && (enemy!=enemy2)){
+    enemy.vx *= -1;
+    enemy2.vy *= -1;
+  }
+
+  });
+//}
+});  
 
 }
