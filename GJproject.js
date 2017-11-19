@@ -358,7 +358,7 @@ function setup() {
     player.wannaX = 0;
     player.wannaY = 0;
     //Anfangskamfwerte
-    player.health = 10;
+    player.health = 29;
     player.damage = 1;
 
     var numberOfEnemies = 3,
