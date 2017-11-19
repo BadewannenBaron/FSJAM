@@ -250,7 +250,7 @@ function checkPlayerEnemyCollision(player, enemy) {
         player.health-=enemy.damage;
         updateHealth=true;
 
-        console.log(enemy.health);
+        //console.log(enemy.health);
 		if(player.health==0){
             setCookie("premium", premiumcounter, 365)
 			window.location = "gameover.html";
@@ -306,7 +306,8 @@ function updateHealthBar(e,posx, posy,small,dead){
         //Create the front red rectangle
         var outerBar = new Graphics();
         outerBar.beginFill(0xFF3300);
-        outerBar.drawRect(0, 0, (length/10*e.health), height);
+        outerBar.drawRect(0, 0, ((length/10)*e.health), height);
+        //console.log((length/10)*e.health);
         outerBar.endFill();
         e.healthBar.addChild(outerBar);
         e.healthBar.outer = outerBar;
@@ -366,7 +367,7 @@ function setup() {
       grid[i] = new Array(y)
       for (j = 0; j < y; j++) {
           grid[i][j] = levelstr[i + j * x]
-          console.log(i + j * x);
+          //console.log(i + j * x);
       }
 
       //console.log(i + ": " + grid[i]);
@@ -401,7 +402,7 @@ function setup() {
     player.wannaX = 0;
     player.wannaY = 0;
     //Anfangskamfwerte
-    player.health = 29;
+    player.health = 10;
     player.damage = 1;
 
     var numberOfEnemies = 3,
@@ -425,7 +426,7 @@ function setup() {
 
         //Anfangskampfwerte
         enemy.health = 10;
-        enemy.damage = 1;
+        enemy.damage = 0.5;
         enemy.dead = false;
         //Set the blob's position
         enemy.x = randomx;
