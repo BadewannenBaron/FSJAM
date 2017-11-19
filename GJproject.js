@@ -9,8 +9,9 @@ var enemies = [];
 var metals = [];
 var objects = [];
 var healthBar;
-var premiumcounter=0;
+var premiumcounter= getIntCookie("premium");
 var messageCounter;
+var gameOverScene;
 
 var Side = {
     NONE: 0,
@@ -38,6 +39,7 @@ if (!PIXI.utils.isWebGLSupported()) {
 //Create a container object called the `stage`
 // Whatever you put inside the stage will be rendered on the canvas.
 var stage = new Container();
+
 
 //definiert den renderer
 renderer = autoDetectRenderer(256, 256);
@@ -242,13 +244,33 @@ function checkPlayerEnemyCollision(player, enemy) {
     // return false;
     if (isPlayerEnemyCollision(player, enemy)) {
         enemy.health-=player.damage;
-        player.health-=enemy.health;
+
+        player.health-=enemy.damage;
         console.log(enemy.health);
+		if(player.health==0){
+            setCookie("premium", premiumcounter, 365)
+			window.location = "gameover.html";
+
+			//stage.visible = false;
+           // gameOverScene.visible = true;
+			//stage.removeChild(player);
+
+        }
+
         if(enemy.health==0){
             replaceEnemyByMetal(enemy);
         }
+
         player.x = player.x - 3 * player.vx;
         player.y = player.y - 3 * player.vy;
+        //oben/unten rausgebounced?
+        if(isOutsideBoundary(player)){
+            player.y = player.y + 3 * player.vy;
+        }
+        //seitlich rausgebounced?
+        if(isOutsideBoundary(player)){
+            player.x = player.x + 3 * player.vx;
+        }
 
         return true;
     }
@@ -270,14 +292,18 @@ function checkPlayerMetlCollision(player, Metl) {
 }
 
 function replaceMetl(Metl) {
-    if (isPlayerEnemyCollision(player, Metl)) {
-        stage.removeChild(Metl)
+    stage.removeChild(Metl);
         metals.splice(metals.indexOf(Metl), 1);
        premiumcounter++;
 
+<<<<<<< HEAD
     }
+=======
+>>>>>>> 9726c638096e3c6b36770503e1eec962a8533369
 
 }
+
+
 
 function replaceEnemyByMetal(enemy) {
     if (isPlayerEnemyCollision(player, enemy)) {
@@ -288,13 +314,15 @@ function replaceEnemyByMetal(enemy) {
         metl.y = enemy.y;
         metl.vx = 0;
         metl.vy = 0;
-        metals.push(metl);
-        stage.addChild(metl);
+		setTimeout(function(){metals.push(metl);},200);
+		stage.addChild(metl);
     }
 }
 
 
 function setup() {
+
+
 
     // setup grid (level)
     //grid = levels();
@@ -341,7 +369,7 @@ function setup() {
     player.wannaX = 0;
     player.wannaY = 0;
     //Anfangskamfwerte
-    player.health = 10;
+    player.health = 29;
     player.damage = 1;
 
     var numberOfEnemies = 3,
@@ -374,8 +402,15 @@ function setup() {
         enemy.vy = 0;
 
         //Enemy an legaler Stelle erzeugt? Wenn nicht zurücksetzen
-        //Achtung: Enemies können noch aufeinander erzeugt werden
-        if(isOutsideBoundary(enemy) || isPlayerEnemyCollision(player, enemy)){
+        for(var j in enemies){
+
+                var enemyNearEnemy = sidestep(enemy, enemies[j]);
+                if ((enemyNearEnemy == true) && (enemy != enemies[j])) {
+                    break;
+                }
+        }
+
+        if(isOutsideBoundary(enemy) || isPlayerEnemyCollision(player, enemy) || enemyNearEnemy){
             i-=1;
         }
 
@@ -406,6 +441,32 @@ function setup() {
     healthBar.addChild(outerBar);
     healthBar.outer = outerBar;
 
+
+	gameOverScene = new Container();
+	//gameOverScene.position.set(window.innerWidth/2 ,window.innerHeight/2)
+	stage.addChild(gameOverScene);
+	gameOverScene.visible = false;
+
+	var losewindow = new Graphics();
+    losewindow.beginFill(0xf7df1e);
+    losewindow.drawRect((window.innerWidth/2)-250 ,(window.innerHeight/2)-300, 500 ,600);
+    losewindow.endFill();
+    gameOverScene.addChild(losewindow);
+
+	/*messageGameOver = new Text(
+    "The End?",
+    {fontFamily: "Arial",
+            fontSize: 50,
+            fill: "white"}
+  );
+  messageGameOver.x = 120;
+  messageGameOver.y = stage.height / 2 - 32;
+  gameOverScene.addChild(messageGameOver);*/
+
+
+
+
+
     var messageWelle = new Text(
         "Welle:", {
             fontFamily: "Arial",
@@ -425,7 +486,10 @@ function setup() {
 	messageCounter.position.set(window.innerWidth - 270,38 );
     stage.addChild(messageCounter);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9726c638096e3c6b36770503e1eec962a8533369
 
     var left = keyboard(37), //Ascii keyboard bindings
         up = keyboard(38),
@@ -552,3 +616,57 @@ function play() {
 	}
 
 }
+<<<<<<< HEAD
+=======
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// COOKIE FUNCTIONS
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date()
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000))
+    var expires = "expires="+d.toUTCString()
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/"
+}
+
+function getCookie(cname) {
+    var name = cname + "="
+    var ca = document.cookie.split(';')
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i]
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1)
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length)
+        }
+    }
+    return ""
+}
+
+function getIntCookie(cname) {
+    var result = getCookie(cname)
+
+    // return 0
+    // if (cname === "scrap") return 100; else return 0;
+
+    if (result == "") {
+        result = 0
+    } else {
+        result = parseInt(result)
+    }
+
+    return result
+}
+>>>>>>> 9726c638096e3c6b36770503e1eec962a8533369
