@@ -4,7 +4,6 @@
 }
 html { 
 	background-color:#061639;
-	background-size: cover;
 }
 body{
 	font-family: "Exo 2",Arial, sans-serif;
@@ -18,14 +17,6 @@ p{
 	padding: 0.3em 0 0.3em 0;
 }
 
-a{
-	color: #fc0;
-	text-decoration: none;
-}
-a:hover{
-	text-decoration: underline;
-}
- 
 #intro {
 	color: white;
 	margin: 3em auto 3em auto;

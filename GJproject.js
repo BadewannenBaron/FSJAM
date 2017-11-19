@@ -8,6 +8,8 @@ var velocity = 7.5;
 var enemies = [];
 var metals = [];
 var healthBar;
+var premiumcounter=0;
+var messageCounter;
 
 var Side = {
     NONE: 0,
@@ -270,6 +272,30 @@ function checkPlayerEnemyCollision(player, enemy) {
     return false;
 }
 
+function checkPlayerMetlCollision(player, Metl) {
+    // if (isPlayerEnemyCollision(player, enemy)) {
+    //     player.x = player.x - 3 * player.vx;
+    //     player.y = player.y - 3 * player.vy;
+    //     return true;
+    // }
+    // return false;
+    if (isPlayerEnemyCollision(player, Metl)) {
+        replaceMetl(Metl);
+        return true;
+    }
+    return false;
+}
+
+function replaceMetl(Metl) {
+    if (isPlayerEnemyCollision(player, Metl)) {
+        stage.removeChild(Metl)
+        metals.splice(metals.indexOf(Metl), 1);
+       premiumcounter++;
+     
+    }
+    
+}
+
 function replaceEnemyByMetal(enemy) {
     if (isPlayerEnemyCollision(player, enemy)) {
         stage.removeChild(enemy)
@@ -382,15 +408,26 @@ function setup() {
     healthBar.addChild(outerBar);
     healthBar.outer = outerBar;
 
-    var message = new Text(
+    var messageWelle = new Text(
         "Welle:", {
             fontFamily: "Arial",
             fontSize: 32,
             fill: "white"
-        }
-    );
-    message.position.set(window.innerWidth - 170, 6);
-    stage.addChild(message);
+        });
+		
+	  messageCounter = new Text(
+        "PREMIUM-Counter:"+premiumcounter, {
+            fontFamily: "Arial",
+            fontSize: 24,
+            fill: "white"
+        });
+    messageWelle.position.set(window.innerWidth - 170, 6);
+    stage.addChild(messageWelle);
+	
+	messageCounter.position.set(window.innerWidth - 270,38 );
+    stage.addChild(messageCounter);
+
+	
 
     var left = keyboard(37), //Ascii keyboard bindings
         up = keyboard(38),
@@ -501,7 +538,8 @@ function gameLoop() {
         });
     }
 
-/*
+	
+/*	
     tick++
     if (tick == 60) {
         tick = 0;
@@ -564,4 +602,21 @@ function play() {
             }
         });
     });
+
+	metals.forEach(function(metl) {
+	checkPlayerMetlCollision(player, metl);
+	});
+	
+	if (premiumcounter>0){
+		stage.removeChild(messageCounter);
+		messageCounter = new Text(
+        "PREMIUM-Counter:"+premiumcounter, {
+            fontFamily: "Arial",
+            fontSize: 24,
+            fill: "white"
+        });
+	messageCounter.position.set(window.innerWidth - 270,38 );
+    stage.addChild(messageCounter);
+	}
+
 }
