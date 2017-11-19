@@ -167,10 +167,10 @@ function isOutsideBoundary(entity) {
     var newX = entity.x + entity.vx
     var newY = entity.y + entity.vy
 
-    var lowerX = (newX - newX % 50) / 50
-    var upperX = (newX + entity.width-1 - (newX + entity.width-1) % 50) / 50
-    var lowerY = (newY - newY % 50) / 50
-    var upperY = (newY + entity.height-1 - (newY + entity.height-1) % 50) / 50
+    var lowerX = (newX - newX % 100) / 100
+    var upperX = (newX + entity.width-1 - (newX + entity.width-1) % 100) / 100
+    var lowerY = (newY - newY % 100) / 100
+    var upperY = (newY + entity.height-1 - (newY + entity.height-1) % 100) / 100
 
     if (newX >= 0 && upperX < x && newY >= 0 && upperY < y &&
         grid[lowerX][lowerY] == 1 &&
