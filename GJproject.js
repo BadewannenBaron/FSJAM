@@ -255,11 +255,21 @@ function checkPlayerEnemyCollision(player, enemy) {
 			//stage.removeChild(player);
 			
         }
+
         if(enemy.health==0){
             replaceEnemyByMetal(enemy);
-        }
+        }        
+        
         player.x = player.x - 3 * player.vx;
         player.y = player.y - 3 * player.vy;
+        //oben/unten rausgebounced?
+        if(isOutsideBoundary(player)){
+            player.y = player.y + 3 * player.vy;
+        }
+        //seitlich rausgebounced?
+        if(isOutsideBoundary(player)){
+            player.x = player.x + 3 * player.vx;
+        }
 
         return true;
     }
@@ -381,8 +391,15 @@ function setup() {
         enemy.vy = 0;
         
         //Enemy an legaler Stelle erzeugt? Wenn nicht zurücksetzen
-        //Achtung: Enemies können noch aufeinander erzeugt werden
-        if(isOutsideBoundary(enemy) || isPlayerEnemyCollision(player, enemy)){
+        for(var j in enemies){
+
+                var enemyNearEnemy = sidestep(enemy, enemies[j]);
+                if ((enemyNearEnemy == true) && (enemy != enemies[j])) {
+                    break;
+                }
+        }
+
+        if(isOutsideBoundary(enemy) || isPlayerEnemyCollision(player, enemy) || enemyNearEnemy){
             i-=1;
         }
         
@@ -459,7 +476,6 @@ function setup() {
     stage.addChild(messageCounter);
 
 	
-
     var left = keyboard(37), //Ascii keyboard bindings
         up = keyboard(38),
         right = keyboard(39),
