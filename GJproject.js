@@ -1,7 +1,7 @@
 
 // Global variables, one dead kitten for each one
-var x = 20
-var y = 10
+var x = 14
+var y = 8
 var grid = new Array(x)
 var player, state, tick = 0;
 var velocity = 7.5;
@@ -274,9 +274,9 @@ function replaceMetl(Metl) {
         stage.removeChild(Metl)
         metals.splice(metals.indexOf(Metl), 1);
        premiumcounter++;
-     
+
     }
-    
+
 }
 
 function replaceEnemyByMetal(enemy) {
@@ -297,15 +297,20 @@ function replaceEnemyByMetal(enemy) {
 function setup() {
 
     // setup grid (level)
+    //grid = levels();
+    var levelstr = '1111111110000111111111111111111111111111101111111111111001111111111110011111111111110111000111110001110101111100'
+
     for (i = 0; i < x; i++) {
-        grid[i] = new Array(y)
-        for (j = 0; j < y; j++) {
-            grid[i][j] = 1
-        }
-        // console.log(i + ": " + grid[i]);
+      grid[i] = new Array(y)
+      for (j = 0; j < y; j++) {
+          grid[i][j] = levelstr[i + j * x]
+          console.log(i + j * x);
+      }
+
+      //console.log(i + ": " + grid[i]);
     }
+
     objects[1] = [[2,2],[2,3],[3,2]]
-    grid[2][2] = grid[2][3] = grid[3][2] = 0
 
     for (i = 0; i < x; i++) {
         for (j = 0; j < y; j++) {
@@ -315,12 +320,13 @@ function setup() {
             var rectangle = new Graphics();
             //rectangle.lineStyle(4, 0xFF3300, 1);
             rectangle.beginFill(0x66CCFF);
-            rectangle.drawRect(0, 0, 50, 50);
+            rectangle.drawRect(0, 0, 100, 100);
             rectangle.endFill();
-            rectangle.x = 50 * i
-            rectangle.y = 50 * j
+            rectangle.x = 100 * i
+            rectangle.y = 100 * j
             stage.addChild(rectangle);
         }
+    //console.log(i + ": " + grid[i]);
     }
 
     //Create the `player` sprite
@@ -356,7 +362,7 @@ function setup() {
         //Give the enemy a random y position
         //(`randomInt` is a custom function - see below)
         var randomy = randomInt(0, window.innerHeight - enemy.height);
-        
+
         //Anfangskampfwerte
         enemy.health = 10;
         enemy.damage = 1;
@@ -366,13 +372,13 @@ function setup() {
 
         enemy.vx = 0; // Anfangsgeschwindigkeit
         enemy.vy = 0;
-        
+
         //Enemy an legaler Stelle erzeugt? Wenn nicht zurücksetzen
         //Achtung: Enemies können noch aufeinander erzeugt werden
         if(isOutsideBoundary(enemy) || isPlayerEnemyCollision(player, enemy)){
             i-=1;
         }
-        
+
         else{
             enemies.push(enemy);
             stage.addChild(enemy);
@@ -406,7 +412,7 @@ function setup() {
             fontSize: 32,
             fill: "white"
         });
-		
+
 	  messageCounter = new Text(
         "PREMIUM-Counter:"+premiumcounter, {
             fontFamily: "Arial",
@@ -415,11 +421,11 @@ function setup() {
         });
     messageWelle.position.set(window.innerWidth - 170, 6);
     stage.addChild(messageWelle);
-	
+
 	messageCounter.position.set(window.innerWidth - 270,38 );
     stage.addChild(messageCounter);
 
-	
+
 
     var left = keyboard(37), //Ascii keyboard bindings
         up = keyboard(38),
@@ -532,7 +538,7 @@ function play() {
 	metals.forEach(function(metl) {
 	checkPlayerMetlCollision(player, metl);
 	});
-	
+
 	if (premiumcounter>0){
 		stage.removeChild(messageCounter);
 		messageCounter = new Text(
