@@ -1,3 +1,6 @@
-- Kollision mit Objekten Enemies (Kara)
-- Aufsammeln (Nils)
-- Damage (Nils)
+- Kollision mit Objekten Enemies (Kara) -done!
+- Aufsammeln (Nils) -potentially done
+- Damage
+    - Schaden machen (nicht bei gedrückthalten, Bounce)
+    - Leben dartellen (Anpassung health bar)
+- Game lost, Game won
