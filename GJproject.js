@@ -244,11 +244,16 @@ function checkPlayerEnemyCollision(player, enemy) {
     // return false;
     if (isPlayerEnemyCollision(player, enemy)) {
         enemy.health-=player.damage;
+
         player.health-=enemy.damage;
         console.log(enemy.health);
 		if(player.health==0){
-			stage.visible = false;
-            gameOverScene.visible = true;
+			window.location = "gameover.html";
+			
+			//stage.visible = false;
+           // gameOverScene.visible = true;
+			//stage.removeChild(player);
+			
         }
         if(enemy.health==0){
             replaceEnemyByMetal(enemy);
@@ -410,13 +415,13 @@ function setup() {
 	
 	
 	gameOverScene = new Container();
-	//gameOverScene.position.set(500, 500)
+	//gameOverScene.position.set(window.innerWidth/2 ,window.innerHeight/2)
 	stage.addChild(gameOverScene);
 	gameOverScene.visible = false;
 	
 	var losewindow = new Graphics();
     losewindow.beginFill(0xf7df1e);
-    losewindow.drawRect(0, 0, 500, 500);
+    losewindow.drawRect((window.innerWidth/2)-250 ,(window.innerHeight/2)-300, 500 ,600);
     losewindow.endFill();
     gameOverScene.addChild(losewindow);
 	
