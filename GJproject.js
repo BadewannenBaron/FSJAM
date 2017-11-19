@@ -12,6 +12,7 @@ var updateHealth;
 var premiumcounter=0;
 var healthBar;
 var premiumcounter= getIntCookie("premium");
+var levelcounter= getIntCookie("level");
 var messageCounter;
 var gameOverScene;
 
@@ -253,6 +254,7 @@ function checkPlayerEnemyCollision(player, enemy) {
         //console.log(enemy.health);
 		if(player.health==0){
             setCookie("premium", premiumcounter, 365)
+            setCookie("level", levelcounter+1, 365)
 			window.location = "gameover.html";
 
 			//stage.visible = false;
@@ -361,8 +363,9 @@ function setup() {
 
     // setup grid (level)
     //grid = levels();
-    var levelstr = levels[Math.floor(Math.random()*levels.length)];
-
+    //var levelstr = levels[Math.floor(Math.random()*levels.length)];
+    var levelstr = levels[levelcounter]
+    //console.log(levelstr);
     for (i = 0; i < x; i++) {
       grid[i] = new Array(y)
       for (j = 0; j < y; j++) {
