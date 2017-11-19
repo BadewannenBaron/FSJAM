@@ -9,7 +9,7 @@ var enemies = [];
 var metals = [];
 var objects = [];
 var healthBar;
-var premiumcounter=0;
+var premiumcounter= getIntCookie("premium");
 var messageCounter;
 var gameOverScene;
 
@@ -248,18 +248,19 @@ function checkPlayerEnemyCollision(player, enemy) {
         player.health-=enemy.damage;
         console.log(enemy.health);
 		if(player.health==0){
+            setCookie("premium", premiumcounter, 365)
 			window.location = "gameover.html";
-			
+
 			//stage.visible = false;
            // gameOverScene.visible = true;
 			//stage.removeChild(player);
-			
+
         }
 
         if(enemy.health==0){
             replaceEnemyByMetal(enemy);
-        }        
-        
+        }
+
         player.x = player.x - 3 * player.vx;
         player.y = player.y - 3 * player.vy;
         //oben/unten rausgebounced?
@@ -294,8 +295,8 @@ function replaceMetl(Metl) {
     stage.removeChild(Metl);
         metals.splice(metals.indexOf(Metl), 1);
        premiumcounter++;
-        
-		
+
+
 }
 
 
@@ -316,7 +317,7 @@ function replaceEnemyByMetal(enemy) {
 
 
 function setup() {
-	
+
 
 
     // setup grid (level)
@@ -379,7 +380,7 @@ function setup() {
         //Give the enemy a random y position
         //(`randomInt` is a custom function - see below)
         var randomy = randomInt(0, window.innerHeight - enemy.height);
-        
+
         //Anfangskampfwerte
         enemy.health = 10;
         enemy.damage = 1;
@@ -389,7 +390,7 @@ function setup() {
 
         enemy.vx = 0; // Anfangsgeschwindigkeit
         enemy.vy = 0;
-        
+
         //Enemy an legaler Stelle erzeugt? Wenn nicht zurücksetzen
         for(var j in enemies){
 
@@ -402,7 +403,7 @@ function setup() {
         if(isOutsideBoundary(enemy) || isPlayerEnemyCollision(player, enemy) || enemyNearEnemy){
             i-=1;
         }
-        
+
         else{
             enemies.push(enemy);
             stage.addChild(enemy);
@@ -429,21 +430,21 @@ function setup() {
     outerBar.endFill();
     healthBar.addChild(outerBar);
     healthBar.outer = outerBar;
-	
-	
+
+
 	gameOverScene = new Container();
 	//gameOverScene.position.set(window.innerWidth/2 ,window.innerHeight/2)
 	stage.addChild(gameOverScene);
 	gameOverScene.visible = false;
-	
+
 	var losewindow = new Graphics();
     losewindow.beginFill(0xf7df1e);
     losewindow.drawRect((window.innerWidth/2)-250 ,(window.innerHeight/2)-300, 500 ,600);
     losewindow.endFill();
     gameOverScene.addChild(losewindow);
-	
+
 	/*messageGameOver = new Text(
-    "The End?", 
+    "The End?",
     {fontFamily: "Arial",
             fontSize: 50,
             fill: "white"}
@@ -452,9 +453,9 @@ function setup() {
   messageGameOver.y = stage.height / 2 - 32;
   gameOverScene.addChild(messageGameOver);*/
 
-	
 
-  
+
+
 
     var messageWelle = new Text(
         "Welle:", {
@@ -462,7 +463,7 @@ function setup() {
             fontSize: 32,
             fill: "white"
         });
-		
+
 	  messageCounter = new Text(
         "PREMIUM-Counter:"+premiumcounter, {
             fontFamily: "Arial",
@@ -471,11 +472,11 @@ function setup() {
         });
     messageWelle.position.set(window.innerWidth - 170, 6);
     stage.addChild(messageWelle);
-	
+
 	messageCounter.position.set(window.innerWidth - 270,38 );
     stage.addChild(messageCounter);
 
-	
+
     var left = keyboard(37), //Ascii keyboard bindings
         up = keyboard(38),
         right = keyboard(39),
@@ -587,7 +588,7 @@ function play() {
 	metals.forEach(function(metl) {
 	checkPlayerMetlCollision(player, metl);
 	});
-	
+
 	if (premiumcounter>0){
 		stage.removeChild(messageCounter);
 		messageCounter = new Text(
@@ -600,4 +601,55 @@ function play() {
     stage.addChild(messageCounter);
 	}
 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// COOKIE FUNCTIONS
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date()
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000))
+    var expires = "expires="+d.toUTCString()
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/"
+}
+
+function getCookie(cname) {
+    var name = cname + "="
+    var ca = document.cookie.split(';')
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i]
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1)
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length)
+        }
+    }
+    return ""
+}
+
+function getIntCookie(cname) {
+    var result = getCookie(cname)
+
+    // return 0
+    // if (cname === "scrap") return 100; else return 0;
+
+    if (result == "") {
+        result = 0
+    } else {
+        result = parseInt(result)
+    }
+
+    return result
 }
