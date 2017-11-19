@@ -322,6 +322,8 @@ function setup() {
     // Anfangsgeschwindigkeit
     player.vx = 0;
     player.vy = 0;
+    player.wannaX = 0;
+    player.wannaY = 0;
 
     var numberOfEnemies = 3,
         spacing = 48,
@@ -397,52 +399,15 @@ function setup() {
         right = keyboard(39),
         down = keyboard(40);
 
-    //left
-    left.press = function() {
-        //move the player
-        player.vx = -velocity;
-        player.vy = 0;
-    };
-
-    left.release = function() {
-        //Stop the player
-        if (!right.isDown && player.vy === 0) {
-            player.vx = 0;
-        }
-    };
-
-    //Up
-    up.press = function() {
-        player.vy = -velocity;
-        player.vx = 0;
-    };
-    up.release = function() {
-        if (!down.isDown && player.vx === 0) {
-            player.vy = 0;
-        }
-    };
-
-    //Right
-    right.press = function() {
-        player.vx = velocity;
-        player.vy = 0;
-    };
-    right.release = function() {
-        if (!left.isDown && player.vy === 0) {
-            player.vx = 0;
-        }
-    };
-
-    //Down
-    down.press = function() {
-        player.vy = velocity;
-        player.vx = 0;
-    };
-    down.release = function() {
-        if (!up.isDown && player.vx === 0) {
-            player.vy = 0;
-        }
-    };
+    // Movement wishes
+    right.press = function()   { player.wannaX += 1; };
+    right.release = function() { player.wannaX -= 1; };
+    down.press = function()    { player.wannaY += 1; };
+    down.release = function()  { player.wannaY -= 1; };
+    up.press = function()      { player.wannaY -= 1; };
+    up.release = function()    { player.wannaY += 1; };
+    left.press = function()    { player.wannaX -= 1; };
+    left.release = function()  { player.wannaX += 1; };
 
     checkOutsideBoundary(player);
 
@@ -533,8 +498,12 @@ function gameLoop() {
 }
 
 function play() {
-    player.y += player.vy;
+    // Honor direction wishes
+    player.vx = player.wannaX * velocity;
+    player.vy = player.wannaY * velocity;
+    // Actually move
     player.x += player.vx;
+    player.y += player.vy;
     checkOutsideBoundary(player);
 
     enemies.forEach(function(enemy) {
