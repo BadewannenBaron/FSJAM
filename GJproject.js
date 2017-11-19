@@ -430,34 +430,9 @@ function setup() {
     outerBar.endFill();
     healthBar.addChild(outerBar);
     healthBar.outer = outerBar;
+	
 
-
-	gameOverScene = new Container();
-	//gameOverScene.position.set(window.innerWidth/2 ,window.innerHeight/2)
-	stage.addChild(gameOverScene);
-	gameOverScene.visible = false;
-
-	var losewindow = new Graphics();
-    losewindow.beginFill(0xf7df1e);
-    losewindow.drawRect((window.innerWidth/2)-250 ,(window.innerHeight/2)-300, 500 ,600);
-    losewindow.endFill();
-    gameOverScene.addChild(losewindow);
-
-	/*messageGameOver = new Text(
-    "The End?",
-    {fontFamily: "Arial",
-            fontSize: 50,
-            fill: "white"}
-  );
-  messageGameOver.x = 120;
-  messageGameOver.y = stage.height / 2 - 32;
-  gameOverScene.addChild(messageGameOver);*/
-
-
-
-
-
-    var messageWelle = new Text(
+  var messageWelle = new Text(
         "Welle:", {
             fontFamily: "Arial",
             fontSize: 32,
@@ -602,19 +577,6 @@ function play() {
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // COOKIE FUNCTIONS
 function setCookie(cname, cvalue, exdays) {
