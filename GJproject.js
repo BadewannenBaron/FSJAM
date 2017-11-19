@@ -58,7 +58,7 @@ function startGame() {
         .load(setup);
 }
 
-// -80 sind nicht die richtigen Werte, das hängt dann vom Endsprite player ab
+
 var boundary = {
     "top": 0,
     "bottom": window.innerHeight - 64,
@@ -158,32 +158,28 @@ function contain(sprite, container) {
 }
 
 //Monster-mit-Monster-Kollision
-function sidestep(sprite1, sprite2) {
+function sidestep(s1, s2) {
     var meet = undefined;
 
-    //Mini-Test, da kann eigentlich nichts schief gehen
-    if (sprite1.x < sprite2.x) {
-        meet = true;
+    //von links unten=rechts oben
+    if((s1.x+s1.width+20)>s2.x && (s1.x+s1.width+20)<(s2.x+s2.width)
+    && (s1.y+s1.height)>s2.y && s1.y<(s2.y+s2.height)) {
+      meet = true;
     }
-    /*
-    //eigentlicher Code, woran auch immer es scheitert
-    if((sprite1.x+64)>sprite2.x && (sprite1.x+64)<(sprite2.x+64)
-    && sprite1.y>sprite2.y && sprite1.y<(sprite2.y+64)) {
-    meet = true;
-    }
-
-    if((sprite2.x+64)>sprite1.x && (sprite2.x+64)<(sprite1.x+64)
-    && sprite2.y>sprite1.y && sprite2.y<(sprite1.y+64)) {
-    meet = true;
+    if((s2.x+s2.width+20)>s1.x && (s2.x+s2.width+20)<(s1.x+s1.width)
+    && (s2.y+s2.height)>s1.y && s2.y<(s1.y+s1.height)) {
+      meet = true;
     }
 
-    if(sprite1.x>sprite2.x && sprite1.x<(sprite2.x+64)
-    && sprite1.y>sprite2.y && sprite1.y<(sprite2.y+64)){
-    meet = true;
+    //von links oben=rechts unten
+    if(s1.x>s2.x && s1.x<(s2.x+s2.width+20)
+    && s1.y>s2.y && s1.y<(s2.y+s2.height+20)){
+      meet = true;
     }
-    if(sprite2.x>sprite1.x && sprite2.x<(sprite1.x+64) && sprite2.y>sprite1.y && sprite2.y<(sprite1.y+64)) {
-    meet = true;
-    }*/
+    if(s1.x>s2.x && s1.x<(s2.x+s2.width+20)
+    && s1.y>s2.y && s1.y<(s2.y+s2.height+20)){
+      meet = true;
+    }
     return meet;
 }
 
@@ -211,7 +207,6 @@ function isOutsideBoundary(entity) {
 
 function checkOutsideBoundary(player) {
     if (isOutsideBoundary(player)) {
-        //player.position.set(player.initX, player.initY);
         player.x = player.x - player.vx;
         player.y = player.y - player.vy;
         return true;
@@ -541,13 +536,8 @@ function play() {
     player.y += player.vy;
     player.x += player.vx;
     checkOutsideBoundary(player);
-    //checkOutsideBoundary(enemy);
 
-    //for(var i in enemies){
     enemies.forEach(function(enemy) {
-        // checkEnemyCollision(enemy,enemy);
-        // checkEnemyCollision(player,enemy);
-        //enemy = enemies[i];
 
         checkPlayerEnemyCollision(player, enemy);
         enemy.y += enemy.vy;
@@ -566,19 +556,12 @@ function play() {
         if (enemyHitsWall === "left" || enemyHitsWall === "right")
             enemy.vx *= -1;
 
-        //3 ist Anzahl der Enemies, global geben!
         enemies.forEach(function(enemy2) {
-            //var enemy2 = enemies[j];
             var enemyNearEnemy = sidestep(enemy, enemy2);
             if ((enemyNearEnemy == true) && (enemy != enemy2)) {
                 enemy.vy *= -1;
                 enemy2.vx *= -1;
             }
-            if ((enemyNearEnemy == true) && (enemy != enemy2)) {
-                enemy.vx *= -1;
-                enemy2.vy *= -1;
-            }
         });
-        //}
     });
 }
