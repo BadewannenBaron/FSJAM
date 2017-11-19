@@ -625,7 +625,6 @@ function play() {
 
 
 
->>>>>>> c8a4c4c40e2fbd21ad12152158d5ce22afbeee23
 // COOKIE FUNCTIONS
 function setCookie(cname, cvalue, exdays) {
     var d = new Date()
