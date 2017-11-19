@@ -7,6 +7,7 @@ var player, state, tick = 0;
 var velocity = 7.5;
 var enemies = [];
 var metals = [];
+var objects = [];
 var healthBar;
 
 var Side = {
@@ -130,7 +131,6 @@ function keyboard(keyCode) {
     return key;
 }
 
-//Da fehlt die jeweils andere Ecke (die wird dann nicht getestet)
 function contain(sprite, container) {
     var collision = undefined;
     //Left
@@ -295,6 +295,8 @@ function setup() {
         }
         // console.log(i + ": " + grid[i]);
     }
+    objects[1] = [2,2][2,3][3,2]
+    //console.log(objects[1];
     grid[2][2] = grid[2][3] = grid[3][2] = 0
 
     for (i = 0; i < x; i++) {
@@ -346,14 +348,6 @@ function setup() {
         enemy.x = randomx;
         enemy.y = randomy;
 
-        /* enemy = new Sprite(resources["images/evil.png"].texture);
-        var randomx = randomInt(0, window.innerWidth - enemy.width);
-        //Give the enemy a random y position
-        //(`randomInt` is a custom function - see below)
-        var randomy = randomInt(0, window.innerHeight - enemy.height);
-        //Set the enemy's position
-        enemy.y = randomy;
-        enemy.x = randomx;*/
         enemy.vx = 0; // Anfangsgeschwindigkeit
         enemy.vy = 0;
 
@@ -500,31 +494,6 @@ function gameLoop() {
             autofinder(enemy, player, richtung);
         });
     }
-
-/*
-    tick++
-    if (tick == 60) {
-        tick = 0;
-
-        enemymovement = direction();
-        if (enemymovement==0){
-            enemy.vx = -3;
-            enemy.vy = 0;
-        }   // Anfangsgeschwindigkeit
-        if (enemymovement==1){
-            enemy.vx = 3;
-            enemy.vy = 0;
-        }
-        if (enemymovement==2){
-            enemy.vy = -3;
-            enemy.vx = 0;
-        }
-        if (enemymovement==3){
-            enemy.vy = 3;
-            enemy.vx = 0;}
-        }
-    }
-*/
 
     //Update the current game state:
     state();
