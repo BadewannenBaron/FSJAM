@@ -1,16 +1,22 @@
 
 // Global variables, one dead kitten for each one
-var x = 20
-var y = 10
+var x = 14
+var y = 8
 var grid = new Array(x)
 var player, state, tick = 0;
 var velocity = 7.5;
 var enemies = [];
 var metals = [];
 var objects = [];
+<<<<<<< HEAD
 var updateHealth;
 var premiumcounter=0;
+=======
+var healthBar;
+var premiumcounter= getIntCookie("premium");
+>>>>>>> 6f4fce16c9978d0b0652f7e9920df21765440e99
 var messageCounter;
+var gameOverScene;
 
 var Side = {
     NONE: 0,
@@ -38,6 +44,7 @@ if (!PIXI.utils.isWebGLSupported()) {
 //Create a container object called the `stage`
 // Whatever you put inside the stage will be rendered on the canvas.
 var stage = new Container();
+
 
 //definiert den renderer
 renderer = autoDetectRenderer(256, 256);
@@ -242,12 +249,27 @@ function checkPlayerEnemyCollision(player, enemy) {
     // return false;
     if (isPlayerEnemyCollision(player, enemy)) {
         enemy.health-=player.damage;
+
         player.health-=enemy.damage;
+<<<<<<< HEAD
         updateHealth=true;
+=======
+        console.log(enemy.health);
+		if(player.health==0){
+            setCookie("premium", premiumcounter, 365)
+			window.location = "gameover.html";
+
+			//stage.visible = false;
+           // gameOverScene.visible = true;
+			//stage.removeChild(player);
+
+        }
+
+>>>>>>> 6f4fce16c9978d0b0652f7e9920df21765440e99
         if(enemy.health==0){
             replaceEnemyByMetal(enemy);
-        }        
-        
+        }
+
         player.x = player.x - 3 * player.vx;
         player.y = player.y - 3 * player.vy;
         //oben/unten rausgebounced?
@@ -310,14 +332,18 @@ function checkPlayerMetlCollision(player, Metl) {
 }
 
 function replaceMetl(Metl) {
-    if (isPlayerEnemyCollision(player, Metl)) {
-        stage.removeChild(Metl)
+    stage.removeChild(Metl);
         metals.splice(metals.indexOf(Metl), 1);
        premiumcounter++;
-     
+
+<<<<<<< HEAD
     }
-    
+=======
+>>>>>>> 9726c638096e3c6b36770503e1eec962a8533369
+
 }
+
+
 
 function replaceEnemyByMetal(enemy) {
     if (isPlayerEnemyCollision(player, enemy)) {
@@ -328,25 +354,37 @@ function replaceEnemyByMetal(enemy) {
         metl.y = enemy.y;
         metl.vx = 0;
         metl.vy = 0;
+<<<<<<< HEAD
         metals.push(metl);
         stage.addChild(metl);
         enemy.dead = true;
+=======
+		setTimeout(function(){metals.push(metl);},200);
+		stage.addChild(metl);
+>>>>>>> 6f4fce16c9978d0b0652f7e9920df21765440e99
     }
 }
 
 
 function setup() {
 
+
+
     // setup grid (level)
+    //grid = levels();
+    var levelstr = '1111111110000111111111111111111111111111101111111111111001111111111110011111111111110111000111110001110101111100'
+
     for (i = 0; i < x; i++) {
-        grid[i] = new Array(y)
-        for (j = 0; j < y; j++) {
-            grid[i][j] = 1
-        }
-        // console.log(i + ": " + grid[i]);
+      grid[i] = new Array(y)
+      for (j = 0; j < y; j++) {
+          grid[i][j] = levelstr[i + j * x]
+          console.log(i + j * x);
+      }
+
+      //console.log(i + ": " + grid[i]);
     }
+
     objects[1] = [[2,2],[2,3],[3,2]]
-    grid[2][2] = grid[2][3] = grid[3][2] = 0
 
     for (i = 0; i < x; i++) {
         for (j = 0; j < y; j++) {
@@ -356,12 +394,13 @@ function setup() {
             var rectangle = new Graphics();
             //rectangle.lineStyle(4, 0xFF3300, 1);
             rectangle.beginFill(0x66CCFF);
-            rectangle.drawRect(0, 0, 50, 50);
+            rectangle.drawRect(0, 0, 100, 100);
             rectangle.endFill();
-            rectangle.x = 50 * i
-            rectangle.y = 50 * j
+            rectangle.x = 100 * i
+            rectangle.y = 100 * j
             stage.addChild(rectangle);
         }
+    //console.log(i + ": " + grid[i]);
     }
 
     //Create the `player` sprite
@@ -376,7 +415,7 @@ function setup() {
     player.wannaX = 0;
     player.wannaY = 0;
     //Anfangskamfwerte
-    player.health = 10;
+    player.health = 29;
     player.damage = 1;
 
     var numberOfEnemies = 3,
@@ -397,7 +436,7 @@ function setup() {
         //Give the enemy a random y position
         //(`randomInt` is a custom function - see below)
         var randomy = randomInt(0, window.innerHeight - enemy.height);
-        
+
         //Anfangskampfwerte
         enemy.health = 10;
         enemy.damage = 1;
@@ -408,7 +447,7 @@ function setup() {
 
         enemy.vx = 0; // Anfangsgeschwindigkeit
         enemy.vy = 0;
-        
+
         //Enemy an legaler Stelle erzeugt? Wenn nicht zurücksetzen
         for(var j in enemies){
 
@@ -421,7 +460,7 @@ function setup() {
         if(isOutsideBoundary(enemy) || isPlayerEnemyCollision(player, enemy) || enemyNearEnemy){
             i-=1;
         }
-        
+
         else{
             enemies.push(enemy);
             stage.addChild(enemy);
@@ -434,13 +473,39 @@ function setup() {
 
     updateHealthBar(player,20,6,false,false);
 
+
+	gameOverScene = new Container();
+	//gameOverScene.position.set(window.innerWidth/2 ,window.innerHeight/2)
+	stage.addChild(gameOverScene);
+	gameOverScene.visible = false;
+
+	var losewindow = new Graphics();
+    losewindow.beginFill(0xf7df1e);
+    losewindow.drawRect((window.innerWidth/2)-250 ,(window.innerHeight/2)-300, 500 ,600);
+    losewindow.endFill();
+    gameOverScene.addChild(losewindow);
+
+	/*messageGameOver = new Text(
+    "The End?",
+    {fontFamily: "Arial",
+            fontSize: 50,
+            fill: "white"}
+  );
+  messageGameOver.x = 120;
+  messageGameOver.y = stage.height / 2 - 32;
+  gameOverScene.addChild(messageGameOver);*/
+
+
+
+
+
     var messageWelle = new Text(
         "Welle:", {
             fontFamily: "Arial",
             fontSize: 32,
             fill: "white"
         });
-		
+
 	  messageCounter = new Text(
         "PREMIUM-Counter:"+premiumcounter, {
             fontFamily: "Arial",
@@ -449,11 +514,15 @@ function setup() {
         });
     messageWelle.position.set(window.innerWidth - 170, 6);
     stage.addChild(messageWelle);
-	
+
 	messageCounter.position.set(window.innerWidth - 270,38 );
     stage.addChild(messageCounter);
 
-	
+<<<<<<< HEAD
+
+=======
+>>>>>>> 9726c638096e3c6b36770503e1eec962a8533369
+
     var left = keyboard(37), //Ascii keyboard bindings
         up = keyboard(38),
         right = keyboard(39),
@@ -567,7 +636,7 @@ function play() {
 	metals.forEach(function(metl) {
 	checkPlayerMetlCollision(player, metl);
 	});
-	
+
 	if (premiumcounter>0){
 		stage.removeChild(messageCounter);
 		messageCounter = new Text(
@@ -580,6 +649,7 @@ function play() {
     stage.addChild(messageCounter);
 	}
 
+<<<<<<< HEAD
 
     if(updateHealth==true){
         stage.removeChild(player.healthBar);
@@ -587,3 +657,60 @@ function play() {
     }
 
 }
+=======
+}
+<<<<<<< HEAD
+=======
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// COOKIE FUNCTIONS
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date()
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000))
+    var expires = "expires="+d.toUTCString()
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/"
+}
+
+function getCookie(cname) {
+    var name = cname + "="
+    var ca = document.cookie.split(';')
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i]
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1)
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length)
+        }
+    }
+    return ""
+}
+
+function getIntCookie(cname) {
+    var result = getCookie(cname)
+
+    // return 0
+    // if (cname === "scrap") return 100; else return 0;
+
+    if (result == "") {
+        result = 0
+    } else {
+        result = parseInt(result)
+    }
+
+    return result
+}
+>>>>>>> 9726c638096e3c6b36770503e1eec962a8533369
+>>>>>>> 6f4fce16c9978d0b0652f7e9920df21765440e99
