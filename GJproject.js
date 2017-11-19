@@ -360,7 +360,7 @@ function setup() {
 
     // setup grid (level)
     //grid = levels();
-    var levelstr = '1001111111110110011111111101111111000111011111110101110111111101001111111111111011111111111110011111111111111111'
+    var levelstr = levels[Math.floor(Math.random()*levels.length)];
 
     for (i = 0; i < x; i++) {
       grid[i] = new Array(y)
