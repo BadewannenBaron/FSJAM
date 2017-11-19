@@ -296,10 +296,6 @@ function replaceMetl(Metl) {
         metals.splice(metals.indexOf(Metl), 1);
        premiumcounter++;
 
-<<<<<<< HEAD
-    }
-=======
->>>>>>> 9726c638096e3c6b36770503e1eec962a8533369
 
 }
 
@@ -486,10 +482,6 @@ function setup() {
 	messageCounter.position.set(window.innerWidth - 270,38 );
     stage.addChild(messageCounter);
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 9726c638096e3c6b36770503e1eec962a8533369
 
     var left = keyboard(37), //Ascii keyboard bindings
         up = keyboard(38),
@@ -616,9 +608,6 @@ function play() {
 	}
 
 }
-<<<<<<< HEAD
-=======
-
 
 
 
@@ -669,4 +658,3 @@ function getIntCookie(cname) {
 
     return result
 }
->>>>>>> 9726c638096e3c6b36770503e1eec962a8533369
