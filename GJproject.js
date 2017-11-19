@@ -1,13 +1,15 @@
 
 // Global variables, one dead kitten for each one
-var x = 20
-var y = 10
+var x = 14
+var y = 8
 var grid = new Array(x)
 var player, state, tick = 0;
 var velocity = 7.5;
 var enemies = [];
 var metals = [];
 var objects = [];
+var updateHealth;
+var premiumcounter=0;
 var healthBar;
 var premiumcounter= getIntCookie("premium");
 var messageCounter;
@@ -167,10 +169,10 @@ function isOutsideBoundary(entity) {
     var newX = entity.x + entity.vx
     var newY = entity.y + entity.vy
 
-    var lowerX = (newX - newX % 50) / 50
-    var upperX = (newX + entity.width-1 - (newX + entity.width-1) % 50) / 50
-    var lowerY = (newY - newY % 50) / 50
-    var upperY = (newY + entity.height-1 - (newY + entity.height-1) % 50) / 50
+    var lowerX = (newX - newX % 100) / 100
+    var upperX = (newX + entity.width-1 - (newX + entity.width-1) % 100) / 100
+    var lowerY = (newY - newY % 100) / 100
+    var upperY = (newY + entity.height-1 - (newY + entity.height-1) % 100) / 100
 
     if (newX >= 0 && upperX < x && newY >= 0 && upperY < y &&
         grid[lowerX][lowerY] == 1 &&
@@ -222,13 +224,13 @@ function autofinder(s, t, richtung) {
 
 
 function isPlayerEnemyCollision(player, enemy) {
-    if ((player.x > enemy.x) && (player.x < (enemy.x + 64)) && ((player.y > enemy.y) && (player.y < (enemy.y + 64)))) {
+    if ((player.x > enemy.x) && (player.x < (enemy.x + enemy.width)) && ((player.y > enemy.y) && (player.y < (enemy.y + enemy.height)))) {
         return true;
-    } else if (((player.x + 64) > enemy.x) && ((player.x + 64) < (enemy.x + 64)) && ((player.y > enemy.y) && (player.y < (enemy.y + 64)))) {
+    } else if (((player.x + player.width) > enemy.x) && ((player.x + player.width) < (enemy.x + enemy.width)) && ((player.y > enemy.y) && (player.y < (enemy.y + enemy.height)))) {
         return true;
-    } else if ((player.x > enemy.x) && (player.x < (enemy.x + 64)) && (((player.y + 64) > enemy.y) && ((player.y + 64) < (enemy.y + 64)))) {
+    } else if ((player.x > enemy.x) && (player.x < (enemy.x + enemy.width)) && (((player.y + player.height) > enemy.y) && ((player.y + player.height) < (enemy.y + enemy.height)))) {
         return true;
-    } else if (((player.x + 64) > enemy.x) && ((player.x + 64) < (enemy.x + 64)) && (((player.y + 64) > enemy.y) && ((player.y + 64) < (enemy.y + 64)))) {
+    } else if (((player.x + player.width) > enemy.x) && ((player.x + player.width) < (enemy.x + enemy.width)) && (((player.y + player.height) > enemy.y) && ((player.y + player.height) < (enemy.y + enemy.height)))) {
         return true;
     }
     return false;
@@ -246,6 +248,8 @@ function checkPlayerEnemyCollision(player, enemy) {
         enemy.health-=player.damage;
 
         player.health-=enemy.damage;
+        updateHealth=true;
+
         console.log(enemy.health);
 		if(player.health==0){
             setCookie("premium", premiumcounter, 365)
@@ -275,6 +279,37 @@ function checkPlayerEnemyCollision(player, enemy) {
         return true;
     }
     return false;
+}
+
+function updateHealthBar(e,posx, posy,small,dead){
+        //small bar for enemies
+        if(dead){
+            return;
+        }
+        if (small == true){
+            var length = 50;
+            var height = 4;
+        }
+        else{
+            var length = 200;
+            var height = 15;
+        }
+        e.healthBar = new Container();
+        e.healthBar.position.set(posx, posy)
+        stage.addChild(e.healthBar);
+        //Create the black background rectangle
+        var innerBar = new Graphics();
+        innerBar.beginFill(0x000000);
+        innerBar.drawRect(0, 0, length, height);
+        innerBar.endFill();
+        e.healthBar.addChild(innerBar);
+        //Create the front red rectangle
+        var outerBar = new Graphics();
+        outerBar.beginFill(0xFF3300);
+        outerBar.drawRect(0, 0, (length/10*e.health), height);
+        outerBar.endFill();
+        e.healthBar.addChild(outerBar);
+        e.healthBar.outer = outerBar;
 }
 
 function checkPlayerMetlCollision(player, Metl) {
@@ -310,6 +345,9 @@ function replaceEnemyByMetal(enemy) {
         metl.y = enemy.y;
         metl.vx = 0;
         metl.vy = 0;
+        metals.push(metl);
+        stage.addChild(metl);
+        enemy.dead = true;
 		setTimeout(function(){metals.push(metl);},200);
 		stage.addChild(metl);
     }
@@ -321,15 +359,18 @@ function setup() {
 
 
     // setup grid (level)
+    //grid = levels();
+    var levelstr = '1001111111110110011111111101111111000111011111110101110111111101001111111111111011111111111110011111111111111111'
+
     for (i = 0; i < x; i++) {
-        grid[i] = new Array(y)
-        for (j = 0; j < y; j++) {
-            grid[i][j] = 1
-        }
-        // console.log(i + ": " + grid[i]);
+      grid[i] = new Array(y)
+      for (j = 0; j < y; j++) {
+          grid[i][j] = levelstr[i + j * x]
+          console.log(i + j * x);
+      }
+
+      //console.log(i + ": " + grid[i]);
     }
-    objects[1] = [[2,2],[2,3],[3,2]]
-    grid[2][2] = grid[2][3] = grid[3][2] = 0
 
     for (i = 0; i < x; i++) {
         for (j = 0; j < y; j++) {
@@ -339,12 +380,13 @@ function setup() {
             var rectangle = new Graphics();
             //rectangle.lineStyle(4, 0xFF3300, 1);
             rectangle.beginFill(0x66CCFF);
-            rectangle.drawRect(0, 0, 50, 50);
+            rectangle.drawRect(0, 0, 100, 100);
             rectangle.endFill();
-            rectangle.x = 50 * i
-            rectangle.y = 50 * j
+            rectangle.x = 100 * i
+            rectangle.y = 100 * j
             stage.addChild(rectangle);
         }
+    //console.log(i + ": " + grid[i]);
     }
 
     //Create the `player` sprite
@@ -384,6 +426,7 @@ function setup() {
         //Anfangskampfwerte
         enemy.health = 10;
         enemy.damage = 1;
+        enemy.dead = false;
         //Set the blob's position
         enemy.x = randomx;
         enemy.y = randomy;
@@ -407,30 +450,14 @@ function setup() {
         else{
             enemies.push(enemy);
             stage.addChild(enemy);
+            updateHealthBar(enemy,enemy.x,(enemy.y+enemy.height+10),true,enemy.dead);
         }
     }
 
     // Anfangskoordinaten
     stage.addChild(player);
+    updateHealthBar(player,20,6,false,false);
 
-    //Create the health bar
-    healthBar = new Container();
-    healthBar.position.set(20, 6)
-    stage.addChild(healthBar);
-    //Create the black background rectangle
-    var innerBar = new Graphics();
-    innerBar.beginFill(0x000000);
-    innerBar.drawRect(0, 0, 150, 15);
-    innerBar.endFill();
-    healthBar.addChild(innerBar);
-    //Create the front red rectangle
-    var outerBar = new Graphics();
-    outerBar.beginFill(0xFF3300);
-    outerBar.drawRect(0, 0, 150, 15);
-    outerBar.endFill();
-    healthBar.addChild(outerBar);
-    healthBar.outer = outerBar;
-	
 
   var messageWelle = new Text(
         "Welle:", {
@@ -545,6 +572,8 @@ function play() {
         checkPlayerEnemyCollision(player, enemy);
         enemy.y += enemy.vy;
         enemy.x += enemy.vx;
+        stage.removeChild(enemy.healthBar);
+        updateHealthBar(enemy,enemy.x,(enemy.y+enemy.height+10),true,enemy.dead);
 
         if(isOutsideBoundary(enemy)){
             enemy.vx *= -1;
@@ -576,8 +605,26 @@ function play() {
     stage.addChild(messageCounter);
 	}
 
+    if(updateHealth==true){
+        stage.removeChild(player.healthBar);
+        updateHealthBar(player,20,6,false,false);
+    }
+
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> c8a4c4c40e2fbd21ad12152158d5ce22afbeee23
 // COOKIE FUNCTIONS
 function setCookie(cname, cvalue, exdays) {
     var d = new Date()

@@ -1,8 +1,9 @@
 - Kollision mit Objekten Enemies (Kara) -done!
+    - hier fehlt noch was...
 - Aufsammeln (Nils) -potentially done
 - Damage
     - Schaden machen (nicht bei gedrückthalten, Bounce)
-        - bei Bounce nicht aus dem Screen laufen
+        - bei Bounce nicht aus dem Screen laufen -doneeeee
         [- einzeln drücken]
     - Leben dartellen (Anpassung health bar)
 - Game lost, Game won
