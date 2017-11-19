@@ -250,7 +250,7 @@ function checkPlayerEnemyCollision(player, enemy) {
         player.health-=enemy.damage;
         updateHealth=true;
 
-        console.log(enemy.health);
+        //console.log(enemy.health);
 		if(player.health==0){
             setCookie("premium", premiumcounter, 365)
 			window.location = "gameover.html";
@@ -306,7 +306,8 @@ function updateHealthBar(e,posx, posy,small,dead){
         //Create the front red rectangle
         var outerBar = new Graphics();
         outerBar.beginFill(0xFF3300);
-        outerBar.drawRect(0, 0, (length/10*e.health), height);
+        outerBar.drawRect(0, 0, ((length/10)*e.health), height);
+        //console.log((length/10)*e.health);
         outerBar.endFill();
         e.healthBar.addChild(outerBar);
         e.healthBar.outer = outerBar;
@@ -366,7 +367,7 @@ function setup() {
       grid[i] = new Array(y)
       for (j = 0; j < y; j++) {
           grid[i][j] = levelstr[i + j * x]
-          console.log(i + j * x);
+          //console.log(i + j * x);
       }
 
       //console.log(i + ": " + grid[i]);
@@ -401,7 +402,7 @@ function setup() {
     player.wannaX = 0;
     player.wannaY = 0;
     //Anfangskamfwerte
-    player.health = 29;
+    player.health = 10;
     player.damage = 1;
 
     var numberOfEnemies = 3,
@@ -425,7 +426,7 @@ function setup() {
 
         //Anfangskampfwerte
         enemy.health = 10;
-        enemy.damage = 1;
+        enemy.damage = 0.5;
         enemy.dead = false;
         //Set the blob's position
         enemy.x = randomx;
@@ -456,36 +457,10 @@ function setup() {
 
     // Anfangskoordinaten
     stage.addChild(player);
-
     updateHealthBar(player,20,6,false,false);
 
 
-	gameOverScene = new Container();
-	//gameOverScene.position.set(window.innerWidth/2 ,window.innerHeight/2)
-	stage.addChild(gameOverScene);
-	gameOverScene.visible = false;
-
-	var losewindow = new Graphics();
-    losewindow.beginFill(0xf7df1e);
-    losewindow.drawRect((window.innerWidth/2)-250 ,(window.innerHeight/2)-300, 500 ,600);
-    losewindow.endFill();
-    gameOverScene.addChild(losewindow);
-
-	/*messageGameOver = new Text(
-    "The End?",
-    {fontFamily: "Arial",
-            fontSize: 50,
-            fill: "white"}
-  );
-  messageGameOver.x = 120;
-  messageGameOver.y = stage.height / 2 - 32;
-  gameOverScene.addChild(messageGameOver);*/
-
-
-
-
-
-    var messageWelle = new Text(
+  var messageWelle = new Text(
         "Welle:", {
             fontFamily: "Arial",
             fontSize: 32,
@@ -631,7 +606,6 @@ function play() {
     stage.addChild(messageCounter);
 	}
 
-
     if(updateHealth==true){
         stage.removeChild(player.healthBar);
         updateHealthBar(player,20,6,false,false);
@@ -651,6 +625,7 @@ function play() {
 
 
 
+>>>>>>> c8a4c4c40e2fbd21ad12152158d5ce22afbeee23
 // COOKIE FUNCTIONS
 function setCookie(cname, cvalue, exdays) {
     var d = new Date()
