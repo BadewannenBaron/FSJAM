@@ -8,7 +8,7 @@ var velocity = 7.5;
 var enemies = [];
 var metals = [];
 var objects = [];
-var healthBar;
+var updateHealth;
 var premiumcounter=0;
 var messageCounter;
 
@@ -220,13 +220,13 @@ function autofinder(s, t, richtung) {
 
 
 function isPlayerEnemyCollision(player, enemy) {
-    if ((player.x > enemy.x) && (player.x < (enemy.x + 64)) && ((player.y > enemy.y) && (player.y < (enemy.y + 64)))) {
+    if ((player.x > enemy.x) && (player.x < (enemy.x + enemy.width)) && ((player.y > enemy.y) && (player.y < (enemy.y + enemy.height)))) {
         return true;
-    } else if (((player.x + 64) > enemy.x) && ((player.x + 64) < (enemy.x + 64)) && ((player.y > enemy.y) && (player.y < (enemy.y + 64)))) {
+    } else if (((player.x + player.width) > enemy.x) && ((player.x + player.width) < (enemy.x + enemy.width)) && ((player.y > enemy.y) && (player.y < (enemy.y + enemy.height)))) {
         return true;
-    } else if ((player.x > enemy.x) && (player.x < (enemy.x + 64)) && (((player.y + 64) > enemy.y) && ((player.y + 64) < (enemy.y + 64)))) {
+    } else if ((player.x > enemy.x) && (player.x < (enemy.x + enemy.width)) && (((player.y + player.height) > enemy.y) && ((player.y + player.height) < (enemy.y + enemy.height)))) {
         return true;
-    } else if (((player.x + 64) > enemy.x) && ((player.x + 64) < (enemy.x + 64)) && (((player.y + 64) > enemy.y) && ((player.y + 64) < (enemy.y + 64)))) {
+    } else if (((player.x + player.width) > enemy.x) && ((player.x + player.width) < (enemy.x + enemy.width)) && (((player.y + player.height) > enemy.y) && ((player.y + player.height) < (enemy.y + enemy.height)))) {
         return true;
     }
     return false;
@@ -243,6 +243,7 @@ function checkPlayerEnemyCollision(player, enemy) {
     if (isPlayerEnemyCollision(player, enemy)) {
         enemy.health-=player.damage;
         player.health-=enemy.damage;
+        updateHealth=true;
         if(enemy.health==0){
             replaceEnemyByMetal(enemy);
         }        
@@ -261,6 +262,37 @@ function checkPlayerEnemyCollision(player, enemy) {
         return true;
     }
     return false;
+}
+
+function updateHealthBar(e,posx, posy,small,dead){
+        //small bar for enemies
+        if(dead){
+            return;
+        }
+        if (small == true){
+            var length = 50;
+            var height = 4;
+        }
+        else{
+            var length = 200;
+            var height = 15;
+        }
+        e.healthBar = new Container();
+        e.healthBar.position.set(posx, posy)
+        stage.addChild(e.healthBar);
+        //Create the black background rectangle
+        var innerBar = new Graphics();
+        innerBar.beginFill(0x000000);
+        innerBar.drawRect(0, 0, length, height);
+        innerBar.endFill();
+        e.healthBar.addChild(innerBar);
+        //Create the front red rectangle
+        var outerBar = new Graphics();
+        outerBar.beginFill(0xFF3300);
+        outerBar.drawRect(0, 0, (length/10*e.health), height);
+        outerBar.endFill();
+        e.healthBar.addChild(outerBar);
+        e.healthBar.outer = outerBar;
 }
 
 function checkPlayerMetlCollision(player, Metl) {
@@ -298,6 +330,7 @@ function replaceEnemyByMetal(enemy) {
         metl.vy = 0;
         metals.push(metl);
         stage.addChild(metl);
+        enemy.dead = true;
     }
 }
 
@@ -368,6 +401,7 @@ function setup() {
         //Anfangskampfwerte
         enemy.health = 10;
         enemy.damage = 1;
+        enemy.dead = false;
         //Set the blob's position
         enemy.x = randomx;
         enemy.y = randomy;
@@ -391,29 +425,14 @@ function setup() {
         else{
             enemies.push(enemy);
             stage.addChild(enemy);
+            updateHealthBar(enemy,enemy.x,(enemy.y+enemy.height+10),true,enemy.dead);
         }
     }
 
     // Anfangskoordinaten
     stage.addChild(player);
 
-    //Create the health bar
-    healthBar = new Container();
-    healthBar.position.set(20, 6)
-    stage.addChild(healthBar);
-    //Create the black background rectangle
-    var innerBar = new Graphics();
-    innerBar.beginFill(0x000000);
-    innerBar.drawRect(0, 0, 150, 15);
-    innerBar.endFill();
-    healthBar.addChild(innerBar);
-    //Create the front red rectangle
-    var outerBar = new Graphics();
-    outerBar.beginFill(0xFF3300);
-    outerBar.drawRect(0, 0, 150, 15);
-    outerBar.endFill();
-    healthBar.addChild(outerBar);
-    healthBar.outer = outerBar;
+    updateHealthBar(player,20,6,false,false);
 
     var messageWelle = new Text(
         "Welle:", {
@@ -528,6 +547,8 @@ function play() {
         checkPlayerEnemyCollision(player, enemy);
         enemy.y += enemy.vy;
         enemy.x += enemy.vx;
+        stage.removeChild(enemy.healthBar);
+        updateHealthBar(enemy,enemy.x,(enemy.y+enemy.height+10),true,enemy.dead);
 
         if(isOutsideBoundary(enemy)){
             enemy.vx *= -1;
@@ -558,5 +579,11 @@ function play() {
 	messageCounter.position.set(window.innerWidth - 270,38 );
     stage.addChild(messageCounter);
 	}
+
+
+    if(updateHealth==true){
+        stage.removeChild(player.healthBar);
+        updateHealthBar(player,20,6,false,false);
+    }
 
 }
