@@ -11,6 +11,7 @@ var objects = [];
 var healthBar;
 var premiumcounter=0;
 var messageCounter;
+var gameOverScene;
 
 var Side = {
     NONE: 0,
@@ -38,6 +39,7 @@ if (!PIXI.utils.isWebGLSupported()) {
 //Create a container object called the `stage`
 // Whatever you put inside the stage will be rendered on the canvas.
 var stage = new Container();
+
 
 //definiert den renderer
 renderer = autoDetectRenderer(256, 256);
@@ -133,33 +135,6 @@ function keyboard(keyCode) {
     return key;
 }
 
-/*
-function contain(sprite, container) {
-    var collision = undefined;
-    //Left
-    if (sprite.x < container.x) {
-        sprite.x = container.x;
-        collision = "left";
-    }
-    //Top
-    if (sprite.y < container.y) {
-        sprite.y = container.y;
-        collision = "top";
-    }
-    //Right
-    if (sprite.x + sprite.width > container.width) {
-        sprite.x = container.width - sprite.width;
-        collision = "right";
-    }
-    //Bottom
-    if (sprite.y + sprite.height > container.height) {
-        sprite.y = container.height - sprite.height;
-        collision = "bottom";
-    }
-    //Return the `collision` value
-    return collision;
-}
-*/
 
 //Monster-mit-Monster-Kollision
 function sidestep(s1, s2) {
@@ -268,7 +243,19 @@ function checkPlayerEnemyCollision(player, enemy) {
     // }
     // return false;
     if (isPlayerEnemyCollision(player, enemy)) {
-        replaceEnemyByMetal(enemy);
+        enemy.health-=player.damage;
+        player.health-=enemy.damage;
+        console.log(enemy.health);
+		if(player.health==0){
+			stage.visible = false;
+            gameOverScene.visible = true;
+        }
+        if(enemy.health==0){
+            replaceEnemyByMetal(enemy);
+        }
+        player.x = player.x - 3 * player.vx;
+        player.y = player.y - 3 * player.vy;
+
         return true;
     }
     return false;
@@ -314,6 +301,8 @@ function replaceEnemyByMetal(enemy) {
 
 
 function setup() {
+	
+
 
     // setup grid (level)
     for (i = 0; i < x; i++) {
@@ -353,6 +342,9 @@ function setup() {
     player.vy = 0;
     player.wannaX = 0;
     player.wannaY = 0;
+    //Anfangskamfwerte
+    player.health = 10;
+    player.damage = 1;
 
     var numberOfEnemies = 3,
         spacing = 48,
@@ -372,7 +364,10 @@ function setup() {
         //Give the enemy a random y position
         //(`randomInt` is a custom function - see below)
         var randomy = randomInt(0, window.innerHeight - enemy.height);
-
+        
+        //Anfangskampfwerte
+        enemy.health = 10;
+        enemy.damage = 1;
         //Set the blob's position
         enemy.x = randomx;
         enemy.y = randomy;
@@ -412,6 +407,32 @@ function setup() {
     outerBar.endFill();
     healthBar.addChild(outerBar);
     healthBar.outer = outerBar;
+	
+	
+	gameOverScene = new Container();
+	//gameOverScene.position.set(500, 500)
+	stage.addChild(gameOverScene);
+	gameOverScene.visible = false;
+	
+	var losewindow = new Graphics();
+    losewindow.beginFill(0xf7df1e);
+    losewindow.drawRect(0, 0, 500, 500);
+    losewindow.endFill();
+    gameOverScene.addChild(losewindow);
+	
+	/*messageGameOver = new Text(
+    "The End?", 
+    {fontFamily: "Arial",
+            fontSize: 50,
+            fill: "white"}
+  );
+  messageGameOver.x = 120;
+  messageGameOver.y = stage.height / 2 - 32;
+  gameOverScene.addChild(messageGameOver);*/
+
+	
+
+  
 
     var messageWelle = new Text(
         "Welle:", {
@@ -532,21 +553,6 @@ function play() {
             enemy.vx *= -1;
             enemy.vy *= -1;
         }
-
-        /*
-        var enemyHitsWall = contain(enemy, {
-            x: 0,
-            y: 0,
-            width: 1000,
-            height: 500
-        });
-        //If the enemy hits the top or bottom of the stage, reverse
-        //its direction
-        if (enemyHitsWall === "top" || enemyHitsWall === "bottom")
-            enemy.vy *= -1;
-        if (enemyHitsWall === "left" || enemyHitsWall === "right")
-            enemy.vx *= -1;
-        */
 
         enemies.forEach(function(enemy2) {
             var enemyNearEnemy = sidestep(enemy, enemy2);
