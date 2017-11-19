@@ -1,7 +1,7 @@
 
 // Global variables, one dead kitten for each one
-var x = 10
-var y = 5
+var x = 20
+var y = 10
 var grid = new Array(x)
 var player, state, tick = 0;
 var velocity = 7.5;
@@ -62,9 +62,9 @@ function startGame() {
 
 var boundary = {
     "top": 0,
-    "bottom": window.innerHeight - 64,
+    "bottom": window.innerHeight - 50,
     "left": 0,
-    "right": window.innerWidth - 64
+    "right": window.innerWidth - 50
 };
 
 function randomInt(min, max) {
@@ -131,6 +131,7 @@ function keyboard(keyCode) {
     return key;
 }
 
+/*
 function contain(sprite, container) {
     var collision = undefined;
     //Left
@@ -156,6 +157,7 @@ function contain(sprite, container) {
     //Return the `collision` value
     return collision;
 }
+*/
 
 //Monster-mit-Monster-Kollision
 function sidestep(s1, s2) {
@@ -188,10 +190,10 @@ function isOutsideBoundary(entity) {
     var newX = entity.x + entity.vx
     var newY = entity.y + entity.vy
 
-    var lowerX = (newX - newX % 100) / 100
-    var upperX = (newX + entity.width-1 - (newX + entity.width-1) % 100) / 100
-    var lowerY = (newY - newY % 100) / 100
-    var upperY = (newY + entity.height-1 - (newY + entity.height-1) % 100) / 100
+    var lowerX = (newX - newX % 50) / 50
+    var upperX = (newX + entity.width-1 - (newX + entity.width-1) % 50) / 50
+    var lowerY = (newY - newY % 50) / 50
+    var upperY = (newY + entity.height-1 - (newY + entity.height-1) % 50) / 50
 
     if (newX >= 0 && upperX < x && newY >= 0 && upperY < y &&
         grid[lowerX][lowerY] == 1 &&
@@ -295,8 +297,7 @@ function setup() {
         }
         // console.log(i + ": " + grid[i]);
     }
-    objects[1] = [2,2][2,3][3,2]
-    //console.log(objects[1];
+    objects[1] = [[2,2],[2,3],[3,2]]
     grid[2][2] = grid[2][3] = grid[3][2] = 0
 
     for (i = 0; i < x; i++) {
@@ -307,10 +308,10 @@ function setup() {
             var rectangle = new Graphics();
             //rectangle.lineStyle(4, 0xFF3300, 1);
             rectangle.beginFill(0x66CCFF);
-            rectangle.drawRect(0, 0, 100, 100);
+            rectangle.drawRect(0, 0, 50, 50);
             rectangle.endFill();
-            rectangle.x = 100 * i
-            rectangle.y = 100 * j
+            rectangle.x = 50 * i
+            rectangle.y = 50 * j
             stage.addChild(rectangle);
         }
     }
@@ -352,9 +353,17 @@ function setup() {
 
         enemy.vx = 0; // Anfangsgeschwindigkeit
         enemy.vy = 0;
-
-        enemies.push(enemy);
-        stage.addChild(enemy);
+        
+        //Enemy an legaler Stelle erzeugt? Wenn nicht zurücksetzen
+        //Achtung: Enemies können noch aufeinander erzeugt werden
+        if(isOutsideBoundary(enemy) || isPlayerEnemyCollision(player, enemy)){
+            i-=1;
+        }
+        
+        else{
+            enemies.push(enemy);
+            stage.addChild(enemy);
+        }
     }
 
     // Anfangskoordinaten
@@ -481,18 +490,25 @@ function play() {
         enemy.y += enemy.vy;
         enemy.x += enemy.vx;
 
+        if(isOutsideBoundary(enemy)){
+            enemy.vx *= -1;
+            enemy.vy *= -1;
+        }
+
+        /*
         var enemyHitsWall = contain(enemy, {
             x: 0,
             y: 0,
             width: 1000,
             height: 500
         });
-        //If the enemy hits the top or bottom of th stage, reverse
+        //If the enemy hits the top or bottom of the stage, reverse
         //its direction
         if (enemyHitsWall === "top" || enemyHitsWall === "bottom")
             enemy.vy *= -1;
         if (enemyHitsWall === "left" || enemyHitsWall === "right")
             enemy.vx *= -1;
+        */
 
         enemies.forEach(function(enemy2) {
             var enemyNearEnemy = sidestep(enemy, enemy2);
