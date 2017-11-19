@@ -289,14 +289,14 @@ function checkPlayerMetlCollision(player, Metl) {
 }
 
 function replaceMetl(Metl) {
-    if (isPlayerEnemyCollision(player, Metl)) {
-        stage.removeChild(Metl)
+    stage.removeChild(Metl);
         metals.splice(metals.indexOf(Metl), 1);
        premiumcounter++;
-     
-    }
-    
+        
+		
 }
+
+
 
 function replaceEnemyByMetal(enemy) {
     if (isPlayerEnemyCollision(player, enemy)) {
@@ -307,8 +307,8 @@ function replaceEnemyByMetal(enemy) {
         metl.y = enemy.y;
         metl.vx = 0;
         metl.vy = 0;
-        metals.push(metl);
-        stage.addChild(metl);
+		setTimeout(function(){metals.push(metl);},200);
+		stage.addChild(metl);
     }
 }
 
