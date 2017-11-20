@@ -356,24 +356,46 @@ function replaceEnemyByMetal(enemy) {
     }
 }
 
+function spawnmetal() {
+  var metl = new Sprite(resources["images/metal.png"].texture);
+  var tempmetlx = randomInt(0, 13);
+  var tempmetly = randomInt(0, 7);
+
+  while(!grid[tempmetlx][tempmetly]){
+    var tempmetlx = randomInt(0, 13);
+    var tempmetly = randomInt(0, 7);
+  }
+
+  metl.x = tempmetlx * 100;
+  metl.y = tempmetly * 100;
+
+
+  metl.vx = 0;
+  metl.vy = 0;
+  metals.push(metl);
+  stage.addChild(metl);
+setTimeout(function(){metals.push(metl);},200);
+stage.addChild(metl);
+
+}
+
+
+
 
 function setup() {
 
 
 
     // setup grid (level)
-    //grid = levels();
+
     //var levelstr = levels[Math.floor(Math.random()*levels.length)];
     var levelstr = levels[levelcounter]
-    //console.log(levelstr);
     for (i = 0; i < x; i++) {
       grid[i] = new Array(y)
       for (j = 0; j < y; j++) {
           grid[i][j] = levelstr[i + j * x]
-          //console.log(i + j * x);
-      }
 
-      //console.log(i + ": " + grid[i]);
+      }
     }
 
     for (i = 0; i < x; i++) {
@@ -390,7 +412,6 @@ function setup() {
             rectangle.y = 100 * j
             stage.addChild(rectangle);
         }
-    //console.log(i + ": " + grid[i]);
     }
 
     //Create the `player` sprite
@@ -405,8 +426,15 @@ function setup() {
     player.wannaX = 0;
     player.wannaY = 0;
     //Anfangskamfwerte
-    player.health = 10;
+    player.health = 10;  //TEMP!!!!
     player.damage = 1;
+
+    //create Scrappieces
+    rndmax = randomInt(0,6);
+    for (rndvar=0 ; rndvar < rndmax; rndvar++){
+      spawnmetal();
+      //console.log(rndmax);
+    }
 
     var numberOfEnemies = 3,
         spacing = 48,
